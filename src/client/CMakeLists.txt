@@ -1,7 +1,8 @@
 find_package(SFML COMPONENTS window graphics system REQUIRED)
 
 set(CLIENT_SOURCE_FILES
-    
+    GameState.cpp
+    GameWindow.cpp
 )
 
 add_executable(client client.cpp ${CLIENT_SOURCE_FILES})

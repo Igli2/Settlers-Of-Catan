@@ -12,7 +12,7 @@ namespace client {
 
     class Inventory : public Resizable {
         private:
-            sf::Sprite background;
+            std::array<sf::RectangleShape, 4> background;
             std::array<client::Resource, client::ResourceType::MAX> resources;
         public:
             Inventory(GameState& game_state);

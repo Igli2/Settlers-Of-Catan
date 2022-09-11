@@ -5,6 +5,8 @@
 #include "GameState.h"
 
 namespace client {
+    class GameState;
+    
     class GameWindow : public sf::RenderWindow {
         public:
             GameWindow(client::GameState& game_state);

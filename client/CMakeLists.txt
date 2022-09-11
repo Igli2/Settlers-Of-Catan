@@ -12,6 +12,9 @@ set(CLIENT_SOURCE_FILES
     src/GameState.cpp
     src/GameWindow.cpp
     src/TextureManager.cpp
+    src/Inventory.cpp
+    src/Resource.cpp
+    src/Resizable.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

@@ -12,6 +12,10 @@ client::TextureManager::TextureManager() {
     this->missing_texture.loadFromImage(missing_texture_image);
 
     this->load_directory(RESOURCE_FOLDER);
+
+    if (!this->font.loadFromFile(RESOURCE_FOLDER"/OpenSans.ttf")) {
+        std::cout << "Cannot load font" << std::endl;
+    }
 }
 
 const sf::Texture& client::TextureManager::get_texture(const std::string& name) const {
@@ -49,4 +53,8 @@ void client::TextureManager::load_directory(const std::string& directory) {
 
 bool client::TextureManager::has_texture(const std::string& name) const {
     return this->texture_map.find(name) != this->texture_map.end();
+}
+
+const sf::Font& client::TextureManager::get_font() const {
+    return this->font;
 }

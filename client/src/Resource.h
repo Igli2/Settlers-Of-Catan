@@ -11,9 +11,9 @@ namespace client {
     enum ResourceType {
         GRAIN,
         BRICK,
+        ORE,
         WOOL,
         LUMBER,
-        ORE,
         MAX
     };
 

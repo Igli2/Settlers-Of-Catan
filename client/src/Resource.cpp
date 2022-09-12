@@ -26,6 +26,6 @@ sf::Text& client::Resource::get_render_text() {
 }
 
 void client::Resource::on_resize(GameState& game_state) {
-    this->text.setCharacterSize(20);
+    this->text.setCharacterSize(22);
     this->setScale(0.3f, 0.3f);
 }

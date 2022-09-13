@@ -19,12 +19,8 @@ Run with:
 class Inventory
     stores resources, remaining figures (buttons, display cost on hover), development cards (buttons), victory points, trade button
 
-class Resource: public sf::Sprite
-    uint amount
-    amount getter + setter
-    text attribute
-    text getter
-
-resizable
-    gamestate saves pointer to all
-    resize event
+class DevCard
+    server has dev card QUEUE to draw from
+    inventory has VECTOR of dev cards
+    tooltip on hover
+    click to use

@@ -14,7 +14,7 @@ namespace client {
         ORE,
         WOOL,
         LUMBER,
-        MAX
+        RESOURCE_MAX
     };
 
     class Resource : public sf::Sprite, public Resizable {

@@ -15,6 +15,7 @@ set(CLIENT_SOURCE_FILES
     src/Inventory.cpp
     src/Resource.cpp
     src/Resizable.cpp
+    src/DevelopmentCard.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

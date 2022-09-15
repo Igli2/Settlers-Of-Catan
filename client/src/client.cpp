@@ -1,5 +1,5 @@
-#include "GameState.h"
-#include "GameWindow.h"
+#include "base/GameState.h"
+#include "base/GameWindow.h"
 
 int main() {
     client::GameState game_state;

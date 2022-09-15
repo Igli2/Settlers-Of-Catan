@@ -9,16 +9,18 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 find_package(SFML COMPONENTS window graphics system network REQUIRED)
 
 set(CLIENT_SOURCE_FILES
-    src/GameState.cpp
-    src/GameWindow.cpp
-    src/TextureManager.cpp
-    src/Inventory.cpp
-    src/Resource.cpp
-    src/Resizable.cpp
-    src/DevelopmentCard.cpp
-    src/Clickable.cpp
-    src/LocalizationManager.cpp
+    src/base/GameState.cpp
+    src/base/GameWindow.cpp
+    src/base/TextureManager.cpp
+    src/base/LocalizationManager.cpp
+    src/base/Resizable.cpp
+    src/base/Clickable.cpp
+
+    src/inventory/Inventory.cpp
+    src/inventory/DevelopmentCard.cpp
+    src/inventory/Resource.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})
+target_include_directories(client PRIVATE src)
 target_link_libraries(client sfml-window sfml-graphics sfml-system sfml-network)

@@ -5,9 +5,10 @@
 
 #include "TextureManager.h"
 #include "LocalizationManager.h"
-#include "Inventory.h"
 #include "Resizable.h"
 #include "Clickable.h"
+
+#include "inventory/Inventory.h"
 
 namespace client {
     class GameState {

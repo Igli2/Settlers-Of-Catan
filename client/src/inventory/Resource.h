@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-#include "Resizable.h"
+#include "base/Resizable.h"
 
 namespace client {
     class GameState;

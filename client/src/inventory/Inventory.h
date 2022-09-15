@@ -6,8 +6,9 @@
 #include <algorithm>
 
 #include "Resource.h"
-#include "Resizable.h"
 #include "DevelopmentCard.h"
+
+#include "base/Resizable.h"
 
 #define INV_BORDER_SIZE 5.0f
 #define INV_TOP_HEIGHT 50.0f

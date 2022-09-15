@@ -1,6 +1,7 @@
 #include "Inventory.h"
-#include "GameState.h"
-#include "GameWindow.h"
+
+#include "base/GameState.h"
+#include "base/GameWindow.h"
 
 const std::array<std::string, client::ResourceType::RESOURCE_MAX> resource_texture_names = {
     "grain",

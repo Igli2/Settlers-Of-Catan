@@ -11,9 +11,9 @@ client::TextureManager::TextureManager() {
     }
     this->missing_texture.loadFromImage(missing_texture_image);
 
-    this->load_directory(RESOURCE_FOLDER);
+    this->load_directory(RESOURCE_FOLDER"/textures");
 
-    if (!this->font.loadFromFile(RESOURCE_FOLDER"/OpenSans.ttf")) {
+    if (!this->font.loadFromFile(RESOURCE_FOLDER"/fonts/OpenSans.ttf")) {
         std::cout << "Cannot load font" << std::endl;
     }
 }

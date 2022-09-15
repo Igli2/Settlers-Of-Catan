@@ -1,5 +1,6 @@
 #include "DevelopmentCard.h"
-#include "GameState.h"
+
+#include "base/GameState.h"
 
 const std::array<std::string, client::DevelopmentCardType::DEVELOPMENT_CARD_MAX> card_texture_names = {
     "development_card_knight",

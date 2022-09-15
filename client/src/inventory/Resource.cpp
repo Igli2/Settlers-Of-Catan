@@ -1,6 +1,6 @@
 #include "Resource.h"
 
-#include "GameState.h"
+#include "base/GameState.h"
 
 client::Resource::Resource() : amount{0} {}
 

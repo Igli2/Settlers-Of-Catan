@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 
-#include "Clickable.h"
+#include "base/Clickable.h"
 
 namespace client {
     class GameState;

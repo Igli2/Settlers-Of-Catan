@@ -1,7 +1,7 @@
 #include "LocalizationManager.h"
 
 client::LocalizationManager::LocalizationManager() {
-    this->load_locale(RESOURCE_FOLDER"/en_US.txt");
+    this->load_locale(RESOURCE_FOLDER"/locales/en_US.txt");
 }
 
 void client::LocalizationManager::load_locale(std::string file) {

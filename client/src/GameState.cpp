@@ -33,10 +33,19 @@ void client::GameState::add_clickable_object(Clickable* c) {
     this->clickables.push_back(c);
 }
 
+void client::GameState::remove_clickable_object(Clickable* c) {
+    for (std::vector<client::Clickable*>::iterator c_iter = this->clickables.begin(); c_iter != this->clickables.end(); c_iter++) {
+        if (c == *c_iter) {
+            this->clickables.erase(c_iter);
+            return;
+        }
+    }
+}
+
 void client::GameState::call_mouse_press(sf::Mouse::Button button, const sf::Vector2i& pos) {
     this->last_mouse_pressed = pos;
     for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->on_press(button)) {
+        if (cp->contains(pos) && cp->on_press(*this, button)) {
             break;
         }
     }
@@ -44,12 +53,12 @@ void client::GameState::call_mouse_press(sf::Mouse::Button button, const sf::Vec
 
 void client::GameState::call_mouse_release(sf::Mouse::Button button, const sf::Vector2i& pos) {
     for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->on_release(button)) {
+        if (cp->contains(pos) && cp->on_release(*this, button)) {
             break;
         }
     }
     for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->contains(this->last_mouse_pressed) && cp->on_click(button)) {
+        if (cp->contains(pos) && cp->contains(this->last_mouse_pressed) && cp->on_click(*this, button)) {
             break;
         }
     }
@@ -60,13 +69,17 @@ void client::GameState::call_mouse_move(const sf::Vector2i& pos) {
     for (Clickable* cp : this->clickables) {
         if (!cp->contains(pos) && this->last_hovered == cp) {
             last_hovered = nullptr;
-            cp->on_exit();
+            cp->on_exit(*this);
         }
     }
     for (Clickable* cp : this->clickables) {
         if (cp->contains(pos) && this->last_hovered == nullptr || this->last_hovered != nullptr && !this->last_hovered->contains(pos) && cp->contains(pos)) {
             last_hovered = cp;
-            cp->on_enter();
+            cp->on_enter(*this);
         }
     }
+}
+
+const client::LocalizationManager& client::GameState::get_localization_manager() {
+    return this->localization_manager;
 }

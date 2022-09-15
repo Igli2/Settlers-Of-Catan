@@ -87,3 +87,13 @@ void client::Inventory::on_resize(GameState& game_state) {
         i++;
     }
 }
+
+void client::Inventory::remove_development_card(GameState& game_state, client::DevelopmentCard* dc) {
+    for (std::vector<client::DevelopmentCard*>::iterator dc_iter = this->development_cards.begin(); dc_iter != this->development_cards.end(); dc_iter++) {
+        if (dc == *dc_iter) {
+            this->development_cards.erase(dc_iter);
+            this->on_resize(game_state);
+            return;
+        }
+    }
+}

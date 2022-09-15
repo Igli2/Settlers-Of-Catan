@@ -1,0 +1,9 @@
+knight_description: Move the robber. Steal 1 resource from the owner of a settlement or city adjacent to the robber's new hex.
+monopoly_description: When you play this card, announce 1 type of resource. All other players must give you all of their resources of that type.
+year_of_plenty_description: Take any 2 resources from the bank. Add them to your hand. They can be 2 of the same resource or 2 different resources.
+road_build_description: Place 2 new roads as if you had just built them.
+chapel_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
+university_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
+market_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
+great_hall_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
+library_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.

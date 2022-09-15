@@ -26,7 +26,7 @@ namespace client {
             DevelopmentCardType type;
         public:
             DevelopmentCard(GameState& game_state, DevelopmentCardType type);
-            bool on_click(sf::Mouse::Button button) override;
-            bool on_enter() override;
+            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
+            bool on_enter(GameState& game_state) override;
     };
 }

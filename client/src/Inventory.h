@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <vector>
+#include <algorithm>
 
 #include "Resource.h"
 #include "Resizable.h"
@@ -18,12 +19,13 @@ namespace client {
     class Inventory : public Resizable {
         private:
             std::array<sf::RectangleShape, 5> background;
-            std::array<client::Resource, client::ResourceType::RESOURCE_MAX> resources;
-            std::vector<client::DevelopmentCard*> development_cards; // delete manually when removed
+            std::array<Resource, ResourceType::RESOURCE_MAX> resources;
+            std::vector<DevelopmentCard*> development_cards; // delete manually when removed
         public:
             Inventory(GameState& game_state);
             ~Inventory();
             void render(GameWindow& game_window, GameState& game_state);
             void on_resize(GameState& game_state) override;
+            void remove_development_card(GameState& game_state, DevelopmentCard* dc);
     };
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 
 #include "TextureManager.h"
+#include "LocalizationManager.h"
 #include "Inventory.h"
 #include "Resizable.h"
 #include "Clickable.h"
@@ -13,6 +15,7 @@ namespace client {
             std::vector<Resizable*> resizables; // unregister when objects are deleted on runtime
             std::vector<Clickable*> clickables; // unregister when deleted
             TextureManager texture_manager;
+            LocalizationManager localization_manager;
             sf::Vector2u window_size;
             sf::Vector2i last_mouse_pressed;
             Clickable* last_hovered;
@@ -29,5 +32,7 @@ namespace client {
             void call_mouse_move(const sf::Vector2i& pos); // calls clickable handlers
             void add_resizable_object(Resizable* r);
             void add_clickable_object(Clickable* c);
+            void remove_clickable_object(Clickable* c);
+            const LocalizationManager& get_localization_manager();
     };
 }

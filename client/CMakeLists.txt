@@ -17,6 +17,7 @@ set(CLIENT_SOURCE_FILES
     src/Resizable.cpp
     src/DevelopmentCard.cpp
     src/Clickable.cpp
+    src/LocalizationManager.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

@@ -2,15 +2,19 @@
 #include "GameState.h"
 #include "GameWindow.h"
 
+const std::array<std::string, client::ResourceType::RESOURCE_MAX> resource_texture_names = {
+    "grain",
+    "brick",
+    "ore",
+    "wool",
+    "lumber"
+};
+
 client::Inventory::Inventory(GameState& game_state) : Resizable{game_state} {
     for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
         this->resources[i].init(game_state, (ResourceType)i);
+        this->resources[i].setTexture(game_state.get_texture_manager().get_texture(resource_texture_names[i]));
     }
-    this->resources[0].setTexture(game_state.get_texture_manager().get_texture("grain"));
-    this->resources[1].setTexture(game_state.get_texture_manager().get_texture("brick"));
-    this->resources[2].setTexture(game_state.get_texture_manager().get_texture("ore"));
-    this->resources[3].setTexture(game_state.get_texture_manager().get_texture("wool"));
-    this->resources[4].setTexture(game_state.get_texture_manager().get_texture("lumber"));
 
     this->background[0].setFillColor(sf::Color{61, 33, 9});
     this->background[1].setFillColor(sf::Color{87, 44, 6});
@@ -19,9 +23,18 @@ client::Inventory::Inventory(GameState& game_state) : Resizable{game_state} {
     this->background[4].setFillColor(sf::Color{222, 182, 147});
 
     // test
-    this->development_cards.push_back(DevelopmentCard{game_state, DevelopmentCardType::KNIGHT});
-    this->development_cards.push_back(DevelopmentCard{game_state, DevelopmentCardType::KNIGHT});
-    this->development_cards.push_back(DevelopmentCard{game_state, DevelopmentCardType::KNIGHT});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::KNIGHT});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::MONOPOLY});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::ROAD_BUILD});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::YEAR_OF_PLENTY});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::UNIVERSITY});
+}
+
+client::Inventory::~Inventory() {
+    for (DevelopmentCard* dc : this->development_cards) {
+        delete dc;
+        dc = nullptr;
+    }
 }
 
 void client::Inventory::render(GameWindow& game_window, GameState& game_state) {
@@ -34,8 +47,8 @@ void client::Inventory::render(GameWindow& game_window, GameState& game_state) {
         game_window.draw(this->resources[x].get_render_text());
     }
 
-    for (client::DevelopmentCard& dc : this->development_cards) {
-        game_window.draw(dc);
+    for (client::DevelopmentCard* dc : this->development_cards) {
+        game_window.draw(*dc);
     }
 }
 
@@ -60,11 +73,17 @@ void client::Inventory::on_resize(GameState& game_state) {
         this->resources[x].get_render_text().setPosition(resource_pos_x + x * 100.0f + 45.0f, resource_pos_y + 6.0f);
     }
 
-    int c = 0;
-    for (DevelopmentCard& dc : this->development_cards) {
-        float texture_scale = (inv_height - INV_TOP_HEIGHT - INV_BORDER_SIZE * 9.0f) / dc.getTexture()->getSize().y;
-        dc.setScale(texture_scale, texture_scale);
-        dc.setPosition(INV_BORDER_SIZE * 4.0f + c * (dc.getTexture()->getSize().x * texture_scale + INV_BORDER_SIZE), (float)game_state.get_window_size().y - dc.getTexture()->getSize().y * texture_scale - INV_BORDER_SIZE * 4.0f);
-        c++;
+    int i = 0;
+    float x, y;
+    sf::Vector2u tex_size;
+    for (DevelopmentCard* dc : this->development_cards) {
+        tex_size = dc->getTexture()->getSize();
+        float texture_scale = (inv_height - INV_TOP_HEIGHT - INV_BORDER_SIZE * 9.0f) / tex_size.y;
+        x = INV_BORDER_SIZE * 4.0f + i * (tex_size.x * texture_scale + INV_BORDER_SIZE);
+        y = (float)game_state.get_window_size().y - tex_size.y * texture_scale - INV_BORDER_SIZE * 4.0f;
+        dc->setScale(texture_scale, texture_scale);
+        dc->setPosition(x, y);
+        dc->set_area(sf::IntRect{(int)x, (int)y, (int)(tex_size.x * texture_scale), (int)(tex_size.y * texture_scale)});
+        i++;
     }
 }

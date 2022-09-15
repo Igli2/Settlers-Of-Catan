@@ -1,6 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <array>
+
+#include "Clickable.h"
 
 namespace client {
     class GameState;
@@ -18,10 +21,12 @@ namespace client {
         DEVELOPMENT_CARD_MAX
     };
 
-    class DevelopmentCard : public sf::Sprite {
+    class DevelopmentCard : public sf::Sprite, public Clickable {
         private:
             DevelopmentCardType type;
         public:
             DevelopmentCard(GameState& game_state, DevelopmentCardType type);
+            bool on_click(sf::Mouse::Button button) override;
+            bool on_enter() override;
     };
 }

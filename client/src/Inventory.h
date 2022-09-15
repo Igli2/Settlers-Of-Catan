@@ -19,9 +19,10 @@ namespace client {
         private:
             std::array<sf::RectangleShape, 5> background;
             std::array<client::Resource, client::ResourceType::RESOURCE_MAX> resources;
-            std::vector<client::DevelopmentCard> development_cards;
+            std::vector<client::DevelopmentCard*> development_cards; // delete manually when removed
         public:
             Inventory(GameState& game_state);
+            ~Inventory();
             void render(GameWindow& game_window, GameState& game_state);
             void on_resize(GameState& game_state) override;
     };

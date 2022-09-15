@@ -15,6 +15,12 @@ void client::GameWindow::game_loop(client::GameState& game_state) {
                 this->setView(sf::View(visibleArea));
                 game_state.set_window_size(sf::Vector2u{event.size.width, event.size.height});
                 game_state.resize();
+            } else if (event.type == sf::Event::MouseButtonPressed) {
+                game_state.call_mouse_press(event.mouseButton.button, sf::Vector2i{event.mouseButton.x, event.mouseButton.y});
+            } else if (event.type == sf::Event::MouseButtonReleased) {
+                game_state.call_mouse_release(event.mouseButton.button, sf::Vector2i{event.mouseButton.x, event.mouseButton.y});
+            } else if (event.type == sf::Event::MouseMoved) {
+                game_state.call_mouse_move(sf::Vector2i{event.mouseMove.x, event.mouseMove.y});
             }
         }
 

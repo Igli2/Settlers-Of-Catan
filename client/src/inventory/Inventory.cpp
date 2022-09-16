@@ -29,6 +29,10 @@ client::Inventory::Inventory(GameState& game_state) : Resizable{game_state} {
     this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::ROAD_BUILD});
     this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::YEAR_OF_PLENTY});
     this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::UNIVERSITY});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::MARKET});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::LIBRARY});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::GREAT_HALL});
+    this->development_cards.push_back(new DevelopmentCard{game_state, DevelopmentCardType::CHAPEL});
 }
 
 client::Inventory::~Inventory() {

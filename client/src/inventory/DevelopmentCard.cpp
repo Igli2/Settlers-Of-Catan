@@ -7,7 +7,11 @@ const std::array<std::string, client::DevelopmentCardType::DEVELOPMENT_CARD_MAX>
     "development_card_monopoly",
     "development_card_road_build",
     "development_card_year_of_plenty",
-    "development_card_university"
+    "development_card_university",
+    "development_card_market",
+    "development_card_chapel",
+    "development_card_library",
+    "development_card_great_hall"
 };
 
 const std::array<std::string, client::DevelopmentCardType::DEVELOPMENT_CARD_MAX> card_descriptions = {

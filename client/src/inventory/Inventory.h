@@ -7,6 +7,7 @@
 
 #include "Resource.h"
 #include "DevelopmentCard.h"
+#include "VictoryPoint.h"
 
 #include "base/Resizable.h"
 
@@ -22,6 +23,7 @@ namespace client {
             std::array<sf::RectangleShape, 5> background;
             std::array<Resource, ResourceType::RESOURCE_MAX> resources;
             std::vector<DevelopmentCard*> development_cards; // delete manually when removed
+            VictoryPoint victory_point;
         public:
             Inventory(GameState& game_state);
             ~Inventory();

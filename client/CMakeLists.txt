@@ -19,6 +19,7 @@ set(CLIENT_SOURCE_FILES
     src/inventory/Inventory.cpp
     src/inventory/DevelopmentCard.cpp
     src/inventory/Resource.cpp
+    src/inventory/VictoryPoint.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

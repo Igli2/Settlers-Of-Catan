@@ -6,7 +6,7 @@
 client::Trade::Trade(GameState& game_state) :
     Resizable{game_state},
     Clickable{game_state, sf::Rect<int>{}},
-    overlay{game_state, game_state.get_localization_manager().get_translation("trade_title")} {
+    overlay{game_state} {
         this->setTexture(game_state.get_texture_manager().get_texture("trade"));
 }
 
@@ -17,8 +17,11 @@ void client::Trade::on_resize(GameState& game_state) {
 }
 
 bool client::Trade::on_click(GameState& game_state, sf::Mouse::Button button) {
-    this->overlay.set_active(game_state, true);
-    return true;
+    if (button == sf::Mouse::Button::Left) {
+        this->overlay.set_active(game_state, true);
+        return true;
+    }
+    return false;
 }
 
 void client::Trade::render(GameWindow& game_window, GameState& game_state) {

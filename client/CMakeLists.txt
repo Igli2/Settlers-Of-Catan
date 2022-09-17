@@ -23,6 +23,7 @@ set(CLIENT_SOURCE_FILES
     src/inventory/Resource.cpp
     src/inventory/VictoryPoint.cpp
     src/inventory/Trade.cpp
+    src/inventory/TradeOfferOverlay.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

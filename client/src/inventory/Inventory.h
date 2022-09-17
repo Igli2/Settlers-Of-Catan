@@ -32,5 +32,6 @@ namespace client {
             void render(GameWindow& game_window, GameState& game_state);
             void on_resize(GameState& game_state) override;
             void remove_development_card(GameState& game_state, DevelopmentCard* dc);
+            unsigned int get_resource(ResourceType type);
     };
 }

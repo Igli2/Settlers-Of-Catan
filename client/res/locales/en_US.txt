@@ -10,3 +10,5 @@ library_description: 1 Victory Point! This card will be revealed if you reach th
 trade_title: Select resources you want to trade
 overlay_accept: Accept
 overlay_decline: Decline
+trade_overlay_request: Request
+trade_overlay_cancel: Cancel

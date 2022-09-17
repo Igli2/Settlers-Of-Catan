@@ -8,6 +8,7 @@ void client::Resource::init(GameState& game_state, client::ResourceType type) {
     this->text.setFont(game_state.get_texture_manager().get_font());
     this->text.setString(std::to_string(this->amount));
     this->text.setFillColor(sf::Color::Black);
+    this->text.setCharacterSize(22);
     this->type = type;
 
     game_state.add_resizable_object(this);
@@ -26,7 +27,6 @@ sf::Text& client::Resource::get_render_text() {
 }
 
 void client::Resource::on_resize(GameState& game_state) {
-    this->text.setCharacterSize(22);
     float scale = 40.0f / this->getTexture()->getSize().y;
     this->setScale(scale, scale);
 }

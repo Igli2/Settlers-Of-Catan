@@ -106,3 +106,7 @@ void client::Inventory::remove_development_card(GameState& game_state, client::D
         }
     }
 }
+
+unsigned int client::Inventory::get_resource(ResourceType type) {
+    return this->resources[type].get_amount();
+}

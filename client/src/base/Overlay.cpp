@@ -14,10 +14,6 @@ client::Overlay::Overlay(GameState& game_state, std::string title) :
         this->title.setString(title);
         this->title.setCharacterSize(28);
 
-        // move to TradeOfferOverlay
-        this->accept.set_action_name("Request");
-        this->decline.set_action_name("Cancel");
-
         this->background[0].setFillColor(sf::Color{61, 33, 9});
         this->background[1].setFillColor(sf::Color{87, 44, 6});
         this->background[2].setFillColor(sf::Color{107, 51, 3});
@@ -53,6 +49,11 @@ void client::Overlay::on_accept(GameState& game_state) {}
 
 void client::Overlay::on_decline(GameState& game_state) {
     this->set_active(game_state, false);
+}
+
+void client::Overlay::set_action_names(std::string accept, std::string decline) {
+    this->accept.set_action_name(accept);
+    this->decline.set_action_name(decline);
 }
 
 void client::Overlay::set_dimensions(GameState& game_state, sf::Rect<int> dimensions) {

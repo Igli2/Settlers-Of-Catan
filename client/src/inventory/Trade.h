@@ -4,7 +4,8 @@
 
 #include "base/Resizable.h"
 #include "base/Clickable.h"
-#include "base/Overlay.h"
+
+#include "TradeOfferOverlay.h"
 
 namespace client {
     class GameState;
@@ -12,7 +13,7 @@ namespace client {
 
     class Trade : public sf::Sprite, public Resizable, public Clickable {
         private:
-            Overlay overlay;
+            TradeOfferOverlay overlay;
         public:
             Trade(GameState& game_state);
             void on_resize(GameState& game_state) override;

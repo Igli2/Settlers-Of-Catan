@@ -8,6 +8,7 @@
 #include "Resource.h"
 #include "DevelopmentCard.h"
 #include "VictoryPoint.h"
+#include "Trade.h"
 
 #include "base/Resizable.h"
 
@@ -24,6 +25,7 @@ namespace client {
             std::array<Resource, ResourceType::RESOURCE_MAX> resources;
             std::vector<DevelopmentCard*> development_cards; // delete manually when removed
             VictoryPoint victory_point;
+            Trade trade;
         public:
             Inventory(GameState& game_state);
             ~Inventory();

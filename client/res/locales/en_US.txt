@@ -7,3 +7,6 @@ university_description: 1 Victory Point! This card will be revealed if you reach
 market_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
 great_hall_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
 library_description: 1 Victory Point! This card will be revealed if you reach the number of points required for victory.
+trade_title: Select resources you want to trade
+overlay_accept: Accept
+overlay_decline: Decline

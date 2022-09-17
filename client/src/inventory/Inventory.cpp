@@ -11,7 +11,7 @@ const std::array<std::string, client::ResourceType::RESOURCE_MAX> resource_textu
     "lumber"
 };
 
-client::Inventory::Inventory(GameState& game_state) : Resizable{game_state}, victory_point{game_state} {
+client::Inventory::Inventory(GameState& game_state) : Resizable{game_state}, victory_point{game_state}, trade{game_state} {
     for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
         this->resources[i].init(game_state, (ResourceType)i);
         this->resources[i].setTexture(game_state.get_texture_manager().get_texture(resource_texture_names[i]));
@@ -58,6 +58,7 @@ void client::Inventory::render(GameWindow& game_window, GameState& game_state) {
 
     game_window.draw(this->victory_point.get_sprite());
     game_window.draw(this->victory_point.get_text());
+    this->trade.render(game_window, game_state);
 }
 
 void client::Inventory::on_resize(GameState& game_state) {

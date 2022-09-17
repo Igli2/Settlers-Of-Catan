@@ -15,11 +15,14 @@ set(CLIENT_SOURCE_FILES
     src/base/LocalizationManager.cpp
     src/base/Resizable.cpp
     src/base/Clickable.cpp
+    src/base/Overlay.cpp
+    src/base/OverlayAction.cpp
 
     src/inventory/Inventory.cpp
     src/inventory/DevelopmentCard.cpp
     src/inventory/Resource.cpp
     src/inventory/VictoryPoint.cpp
+    src/inventory/Trade.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

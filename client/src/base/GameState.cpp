@@ -33,7 +33,18 @@ void client::GameState::add_clickable_object(Clickable* c) {
     this->clickables.push_back(c);
 }
 
+void client::GameState::add_clickable_object(Clickable* c, unsigned int priority) {
+    if (this->clickables.size() > priority) {
+        this->clickables.insert(this->clickables.begin() + priority, c);
+    } else {
+        this->add_clickable_object(c);
+    }
+}
+
 void client::GameState::remove_clickable_object(Clickable* c) {
+    if (this->last_hovered == c) {
+        this->last_hovered = nullptr;
+    }
     for (std::vector<client::Clickable*>::iterator c_iter = this->clickables.begin(); c_iter != this->clickables.end(); c_iter++) {
         if (c == *c_iter) {
             this->clickables.erase(c_iter);

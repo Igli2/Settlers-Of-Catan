@@ -1,0 +1,65 @@
+width: 5
+length: 5
+fillTile: "water"
+tiles:
+  - x: 0
+    y: -2
+    tile: "wool"
+  - x: 0
+    y: -1
+    tile: "ore"
+  - x: 0
+    y: 0
+    tile: "grain"
+  - x: 0
+    y: 1
+    tile: "brick"
+  - x: 0
+    y: 2
+    tile: "ore"
+
+  - x: 1
+    y: -2
+    tile: "lumber"
+  - x: 1
+    y: -1
+    tile: "ore"
+  - x: 1
+    y: 0
+    tile: "wool"
+  - x: 1
+    y: 1
+    tile: "lumber"
+  - x: 1
+    y: 2
+    tile: "grain"
+
+  - x: 2
+    y: -2
+    tile: "wool"
+  - x: 2
+    y: -1
+    tile: "grain"
+  - x: 2
+    y: 0
+    tile: "desert"
+  - x: 2
+    y: 1
+    tile: "grain"
+  - x: 2
+    y: 2
+    tile: "wool"
+
+  - x: 3
+    y: -1
+    tile: "brick"
+  - x: 3
+    y: 0
+    tile: "lumber"
+  - x: 3
+    y: 1
+    tile: "brick"
+
+  - x: 4
+    y: 0
+    tile: "lumber"

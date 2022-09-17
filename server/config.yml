@@ -1,0 +1,5 @@
+requiredVictoryPoints: 10
+width: 5
+length: 5
+minCardsForRobbery: 8
+boardFile: "map.yml"

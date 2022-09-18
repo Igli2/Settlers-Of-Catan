@@ -18,8 +18,17 @@ client::Inventory& client::GameState::get_inventory() {
     return this->inventory;
 }
 
+client::HexMap& client::GameState::get_hexmap() {
+    return this->hex_map;
+}
+
 // call the resize method for all resizable objects to resize UI elements
 void client::GameState::resize() {
+    this->map_view.setSize(sf::Vector2f{this->window_size});
+    this->map_view.setCenter(this->window_size.x / 2.0f + this->hex_map.pos.x, this->window_size.y / 2.0f + this->hex_map.pos.y);
+    this->map_view.zoom(this->hex_map.zoom);
+    this->inventory_view.setSize(sf::Vector2f{this->window_size});
+    this->inventory_view.setCenter(this->window_size.x / 2.0f, this->window_size.y / 2.0f);
     for (Resizable* r : this->resizables) {
         r->on_resize(*this);
     }

@@ -24,6 +24,8 @@ set(CLIENT_SOURCE_FILES
     src/inventory/VictoryPoint.cpp
     src/inventory/Trade.cpp
     src/inventory/TradeOfferOverlay.cpp
+
+    src/map/HexMap.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

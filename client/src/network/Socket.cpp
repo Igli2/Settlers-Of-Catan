@@ -52,7 +52,7 @@ network::Socket network::Socket::accept() {
 
 void network::Socket::bind(const uint16_t port) {
     this->create_new_socket();
-    
+
     const sockaddr_in target{AF_INET, htons(port), INADDR_ANY, 0};
 
     if(::bind(this->socket_id, (const sockaddr*)&target, sizeof(sockaddr_in)) < 0) {
@@ -177,7 +177,7 @@ network::Socket::Socket(const int socket_id) : socket_id(socket_id) {
 void network::Socket::create_new_socket() {
     this->disconnect();
 
-    if((this->socket_id = socket(AF_INET, type, 0)) < 0) {
+    if((this->socket_id = socket(AF_INET, this->type, 0)) < 0) {
         throw std::runtime_error("Creation of socket failed!"); 
     }
 }

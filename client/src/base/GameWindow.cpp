@@ -25,7 +25,7 @@ void client::GameWindow::game_loop(client::GameState& game_state) {
                 game_state.call_mouse_move(sf::Vector2i{event.mouseMove.x, event.mouseMove.y});
             } else if (event.type == sf::Event::KeyPressed) {
                 keyboard_handler.on_key_pressed(event.key);
-            } else if(event.type == sf::Event::KeyReleased) {
+            } else if (event.type == sf::Event::KeyReleased) {
                 keyboard_handler.on_key_released(event.key);
             } else if (event.type == sf::Event::MouseWheelScrolled) {
                 float zoom = 1.0f - 0.05f * event.mouseWheelScroll.delta;

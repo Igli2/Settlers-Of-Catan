@@ -16,11 +16,11 @@ namespace client {
 
     const std::array<std::string, client::HexTileType::HEX_TILE_MAX> tile_texture_names = {
         "tile_desert",
-        "tile_desert",
-        "tile_desert",
-        "tile_desert",
-        "tile_desert",
-        "tile_desert"
+        "tile_field",
+        "tile_hill",
+        "tile_forest",
+        "tile_mountain",
+        "tile_pasture"
     };
 
     enum ResourceType {

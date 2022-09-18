@@ -6,7 +6,7 @@
 client::HexMap::HexMap() : size{5, 5}, zoom{1.0f} {
     for (int i = 0; i < this->size.x; i++) {
         for (int j = 0; j < this->size.y - std::abs(i - this->size.y / 2); j++) {
-            this->tilemap.push_back(HexTile{j, i, HexTileType::DESERT});
+            this->tilemap.push_back(HexTile{j, i, (HexTileType)i});
         }
     }
     this->hex_shape.setPointCount(6);

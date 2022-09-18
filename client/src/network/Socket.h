@@ -10,7 +10,7 @@ namespace network {
         uint8_t packet_type;
         std::string data;
 
-        std::string to_binary() const;
+        std::string to_bytes() const;
     };
 
     class Socket {
@@ -50,8 +50,10 @@ namespace network {
             Socket& operator=(Socket&& other);
         private:
             Socket(const int socket_id);
-            void delete_socket();
 
+            void create_new_socket();
+
+            SocketType type;
             int socket_id;
             SocketStatus last_status;
     };

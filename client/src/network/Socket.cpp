@@ -13,7 +13,7 @@ const short network::Socket::MAX_BUFFER_LENGTH = 4096;
 
 //public
 
-std::string network::Packet::to_binary() const {
+std::string network::Packet::to_bytes() const {
     const uint64_t packet_length = (uint64_t)this->data.size();
     std::string binary_packet;
 
@@ -27,10 +27,7 @@ std::string network::Packet::to_binary() const {
 
 //public
 
-network::Socket::Socket(const SocketType type) : socket_id{-1}, last_status(SocketStatus::SUCCESS) {
-    if((this->socket_id = socket(AF_INET, type, 0)) < 0) {
-        throw std::runtime_error("Creation of socket failed!"); 
-    }
+network::Socket::Socket(const SocketType type) : socket_id{-1}, last_status(SocketStatus::SUCCESS), type(type) {
 }
 
 network::Socket::Socket(Socket&& other) : socket_id(-1), last_status(SocketStatus::SUCCESS) {
@@ -38,7 +35,7 @@ network::Socket::Socket(Socket&& other) : socket_id(-1), last_status(SocketStatu
 }
 
 network::Socket::~Socket() {
-    this->delete_socket();
+    this->disconnect();
 }
 
 network::Socket network::Socket::accept() {
@@ -54,6 +51,8 @@ network::Socket network::Socket::accept() {
 }
 
 void network::Socket::bind(const uint16_t port) {
+    this->create_new_socket();
+    
     const sockaddr_in target{AF_INET, htons(port), INADDR_ANY, 0};
 
     if(::bind(this->socket_id, (const sockaddr*)&target, sizeof(sockaddr_in)) < 0) {
@@ -65,6 +64,8 @@ void network::Socket::bind(const uint16_t port) {
 }
 
 void network::Socket::connect(const std::string& address, const uint16_t port) {
+    this->create_new_socket();
+
     sockaddr_in target{AF_INET, htons(port), INADDR_ANY, 0};
     if(!inet_aton(address.c_str(), &target.sin_addr)) {
         throw std::runtime_error("Tried to connect to invalid address!");
@@ -79,10 +80,21 @@ void network::Socket::connect(const std::string& address, const uint16_t port) {
 }
 
 void network::Socket::disconnect() {
-    if(close(this->socket_id) < 0) {
+    if(this->socket_id < 0) return;
+    
+    if(shutdown(this->socket_id, SHUT_RDWR) < 0) {
         this->last_status = SocketStatus::ERROR;
+        this->socket_id = -1;
         return;
     }
+
+    if(close(this->socket_id) < 0) {
+        this->last_status = SocketStatus::ERROR;
+        this->socket_id = -1;
+        return;
+    }
+
+    this->socket_id = -1;
 
     this->last_status = SocketStatus::SUCCESS;
 }
@@ -106,7 +118,7 @@ void network::Socket::send(const std::string& to_send) {
 }
 
 void network::Socket::send(const Packet& to_send) {
-    this->send(to_send.to_binary());
+    this->send(to_send.to_bytes());
 }
 
 network::Packet network::Socket::receive_packet() {
@@ -147,9 +159,10 @@ network::Socket::SocketStatus network::Socket::get_status() const {
 }
 
 network::Socket& network::Socket::operator=(Socket&& other) {
-    this->delete_socket();
+    this->disconnect();
 
     this->socket_id = other.socket_id;
+    this->type = other.type;
     this->last_status = other.last_status;
     other.socket_id = -1;
 
@@ -161,13 +174,10 @@ network::Socket& network::Socket::operator=(Socket&& other) {
 network::Socket::Socket(const int socket_id) : socket_id(socket_id) {
 }
 
-void network::Socket::delete_socket() {
-    if(this->socket_id < 0) return;
-    
+void network::Socket::create_new_socket() {
     this->disconnect();
-    if(shutdown(this->socket_id, SHUT_RDWR) < 0) {
-        this->last_status = SocketStatus::ERROR;
-    }
 
-    this->socket_id = -1;
+    if((this->socket_id = socket(AF_INET, type, 0)) < 0) {
+        throw std::runtime_error("Creation of socket failed!"); 
+    }
 }

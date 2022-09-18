@@ -1,6 +1,50 @@
 #include "GameState.h"
 
-client::GameState::GameState() : window_size{500, 500}, inventory{*this}, last_mouse_pressed{-1, -1}, last_hovered{nullptr} {}
+client::GameState::GameState() :
+    window_size{500, 500},
+    inventory{*this},
+    last_mouse_pressed{-1, -1},
+    last_hovered{nullptr},
+    socket{network::Socket::SocketType::TCP},
+    is_open{true} {
+        socket.connect("192.168.178.34", 50140);
+        if (socket.get_status() == network::Socket::SocketStatus::ERROR) {
+            throw std::runtime_error("Socket connect failed, server offline?");
+        }
+
+        this->receive_thread = std::thread{this->receive_packets, this, &this->socket};
+
+        socket.send(network::Packet{0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP\n"});
+}
+
+void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {
+    network::Packet packet;
+    while(game_state->is_open) {
+        packet = socket->receive_packet();
+        if (socket->get_status() == network::Socket::SocketStatus::ERROR) {
+            throw std::runtime_error("Cannot receive packet");
+        }
+        std::cout << (int)packet.packet_type << ": " << packet.data << std::endl;
+        // handle packet
+        switch (packet.packet_type) {
+            case 0:
+                // GIMME DA TILEMAP
+                break;
+            case 1:
+                return;
+            default:
+                break;
+        }
+    }
+}
+
+client::GameState::~GameState() {
+    this->socket.send(network::Packet{1, "CLOSE CONNECTION; BYE BYE :3\n"});
+    this->is_open = false;
+    // wait 1 second before disconnect?
+    // this->socket.disconnect();
+    this->receive_thread.join();
+}
 
 const client::TextureManager& client::GameState::get_texture_manager() {
     return this->texture_manager;

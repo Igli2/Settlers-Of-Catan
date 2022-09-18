@@ -27,6 +27,8 @@ set(CLIENT_SOURCE_FILES
     src/inventory/TradeOfferOverlay.cpp
 
     src/map/HexMap.cpp
+
+    src/network/Socket.cpp
 )
 
 add_executable(client src/client.cpp ${CLIENT_SOURCE_FILES})

@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <algorithm>
+#include <thread>
 
 #include "TextureManager.h"
 #include "LocalizationManager.h"
@@ -11,6 +12,8 @@
 #include "inventory/Inventory.h"
 
 #include "map/HexMap.h"
+
+#include "network/Socket.h"
 
 namespace client {
     class GameState {
@@ -24,11 +27,15 @@ namespace client {
             Clickable* last_hovered;
             Inventory inventory;
             HexMap hex_map;
+            network::Socket socket;
+            std::thread receive_thread;
         public:
             sf::View inventory_view;
             sf::View map_view;
+            bool is_open;
 
             GameState();
+            ~GameState();
             const TextureManager& get_texture_manager();
             const sf::Vector2u& get_window_size();
             void set_window_size(sf::Vector2u size);
@@ -43,5 +50,7 @@ namespace client {
             void add_clickable_object(Clickable* c, unsigned int priority); // priority defines at which index the clickable is inserted, useful for clickable overlays
             void remove_clickable_object(Clickable* c);
             const LocalizationManager& get_localization_manager();
+
+            static void receive_packets(GameState* game_state, network::Socket* socket);
     };
 }

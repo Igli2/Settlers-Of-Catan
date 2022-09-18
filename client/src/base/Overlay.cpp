@@ -6,7 +6,8 @@ client::Overlay::Overlay(GameState& game_state, std::string title) :
     Clickable{sf::Rect<int>{}},
     accept{game_state, this, OverlayActionType::ACCEPT},
     decline{game_state, this, OverlayActionType::DECLINE},
-    is_active{false} {
+    is_active{false},
+    game_state{game_state} {
         this->blocker.setFillColor(sf::Color{0, 0, 0, 128});
 
         this->title.setFillColor(sf::Color::Black);
@@ -20,7 +21,7 @@ client::Overlay::Overlay(GameState& game_state, std::string title) :
         this->background[3].setFillColor(sf::Color{222, 182, 147});
 }
 
-void client::Overlay::render(GameWindow& game_window, GameState& game_state) {
+void client::Overlay::render(GameWindow& game_window) {
     if (this->is_active) {
         game_window.draw(this->blocker);
         for (sf::RectangleShape& rs : this->background) {
@@ -32,23 +33,25 @@ void client::Overlay::render(GameWindow& game_window, GameState& game_state) {
     }
 }
 
-void client::Overlay::set_active(GameState& game_state, bool state) {
+void client::Overlay::set_active(bool state) {
     if (state) {
-        game_state.add_clickable_object(this, 0);
-        game_state.add_clickable_object(&this->accept, 0);
-        game_state.add_clickable_object(&this->decline, 0);
+        this->game_state.add_clickable_object(this, 0);
+        this->game_state.add_clickable_object(&this->accept, 0);
+        this->game_state.add_clickable_object(&this->decline, 0);
     } else {
-        game_state.remove_clickable_object(this);
-        game_state.remove_clickable_object(&this->accept);
-        game_state.remove_clickable_object(&this->decline);
+        this->game_state.remove_clickable_object(this);
+        this->game_state.remove_clickable_object(&this->accept);
+        this->game_state.remove_clickable_object(&this->decline);
     }
     this->is_active = state;
 }
 
-void client::Overlay::on_accept(GameState& game_state) {}
+void client::Overlay::on_accept() {
+    this->set_active(false);
+}
 
-void client::Overlay::on_decline(GameState& game_state) {
-    this->set_active(game_state, false);
+void client::Overlay::on_decline() {
+    this->set_active(false);
 }
 
 void client::Overlay::set_action_names(std::string accept, std::string decline) {
@@ -56,12 +59,12 @@ void client::Overlay::set_action_names(std::string accept, std::string decline) 
     this->decline.set_action_name(decline);
 }
 
-void client::Overlay::set_dimensions(GameState& game_state, sf::Rect<int> dimensions) {
+void client::Overlay::set_dimensions(sf::Rect<int> dimensions) {
     this->dimensions = dimensions;
 
     // mouse event blocker
-    this->set_area(sf::Rect<int>{0, 0, (int)game_state.get_window_size().x, (int)game_state.get_window_size().y});
-    this->blocker.setSize(sf::Vector2f{(float)game_state.get_window_size().x, (float)game_state.get_window_size().y});
+    this->set_area(sf::Rect<int>{0, 0, (int)this->game_state.get_window_size().x, (int)this->game_state.get_window_size().y});
+    this->blocker.setSize(sf::Vector2f{(float)this->game_state.get_window_size().x, (float)this->game_state.get_window_size().y});
 
     float title_x = dimensions.left + dimensions.width / 2.0f - this->title.getLocalBounds().width / 2.0f;
     this->title.setPosition(title_x, dimensions.top + 20.0f);
@@ -77,8 +80,14 @@ void client::Overlay::set_dimensions(GameState& game_state, sf::Rect<int> dimens
     this->accept.set_area(sf::Rect<int>{this->accept.get_text().getGlobalBounds()});
     this->decline.set_area(sf::Rect<int>{this->decline.get_text().getGlobalBounds()});
 
-    for (int x = 0; x < 4; x++) {
-        this->background[x].setSize(sf::Vector2f{dimensions.width - x * INV_BORDER_SIZE * 2.0f, dimensions.height - x * INV_BORDER_SIZE * 2.0f});
-        this->background[x].setPosition(dimensions.left + x * INV_BORDER_SIZE, dimensions.top + x * INV_BORDER_SIZE);
+    for (int x = 0; x < this->background.size(); x++) {
+        this->background[x].setSize(sf::Vector2f{
+            dimensions.width - x * INV_BORDER_SIZE * 2.0f,
+            dimensions.height - x * INV_BORDER_SIZE * 2.0f
+        });
+        this->background[x].setPosition(
+            dimensions.left + x * INV_BORDER_SIZE,
+            dimensions.top + x * INV_BORDER_SIZE
+        );
     }
 }

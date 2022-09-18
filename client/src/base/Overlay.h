@@ -21,13 +21,14 @@ namespace client {
         protected:
             sf::Rect<int> dimensions;
             bool is_active;
+            GameState& game_state;
         public:
             Overlay(GameState& game_state, std::string title);
-            void render(GameWindow& game_window, GameState& game_state);
-            void set_active(GameState& game_state, bool state);
-            void set_dimensions(GameState& game_state, sf::Rect<int> dimensions); // update inner widgets
-            void on_accept(GameState& game_state);
-            void on_decline(GameState& game_state);
+            void render(GameWindow& game_window);
+            void set_active(bool state);
+            void set_dimensions(sf::Rect<int> dimensions); // update inner widgets
+            void on_accept();
+            void on_decline();
             void set_action_names(std::string accept, std::string decline);
 
             // block all mouse events for clickables not in overlay

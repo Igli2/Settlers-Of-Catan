@@ -17,6 +17,7 @@ set(CLIENT_SOURCE_FILES
     src/base/Clickable.cpp
     src/base/Overlay.cpp
     src/base/OverlayAction.cpp
+    src/base/KeyboardHandler.cpp
 
     src/inventory/Inventory.cpp
     src/inventory/DevelopmentCard.cpp

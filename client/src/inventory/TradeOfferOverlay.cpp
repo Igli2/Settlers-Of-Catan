@@ -3,22 +3,9 @@
 #include "base/GameState.h"
 #include "base/GameWindow.h"
 
-// TODO use array from Inventory.cpp
-const std::array<std::string, client::ResourceType::RESOURCE_MAX> resource_texture_names = {
-    "grain",
-    "brick",
-    "ore",
-    "wool",
-    "lumber"
-};
-
-
-
-
-
 client::TradeOfferResource::TradeOfferResource() : Clickable{sf::Rect<int>{}} {}
 
-client::TradeOfferResource::TradeOfferResource(GameState& game_state, ResourceType type, TradeOfferOverlay* overlay, TradeParty trade_party) :
+client::TradeOfferResource::TradeOfferResource(GameState& game_state, ResourceType type, TradeOfferOverlay* overlay) :
     Clickable{sf::Rect<int>{}},
     res_count{0},
     overlay{overlay},
@@ -52,7 +39,12 @@ bool client::TradeOfferResource::on_click(GameState& game_state, sf::Mouse::Butt
 void client::TradeOfferResource::set_position(float x, float y) {
     this->res_texture.setPosition(x, y);
     this->count_text.setPosition(x + 55.0f, y + 15.0f);
-    this->set_area(sf::Rect<int>{(int)x, (int)y, (int)this->res_texture.getGlobalBounds().width, (int)this->res_texture.getGlobalBounds().height});
+    this->set_area(sf::Rect<int>{
+        (int)x,
+        (int)y,
+        (int)this->res_texture.getGlobalBounds().width,
+        (int)this->res_texture.getGlobalBounds().height
+    });
 }
 
 void client::TradeOfferResource::render(GameWindow& game_window, GameState& game_state) {
@@ -70,7 +62,10 @@ bool client::TradeOfferResource::is_selected() {
 
 client::TradeOfferOverlay::TradeOfferOverlay(GameState& game_state) :
     Overlay{game_state, game_state.get_localization_manager().get_translation("trade_title")} {
-        this->set_action_names(game_state.get_localization_manager().get_translation("trade_overlay_request"), game_state.get_localization_manager().get_translation("trade_overlay_cancel"));
+        this->set_action_names(
+            game_state.get_localization_manager().get_translation("trade_overlay_request"),
+            game_state.get_localization_manager().get_translation("trade_overlay_cancel")
+        );
         this->selection_border_offer.setOutlineThickness(3);
         this->selection_border_request.setOutlineThickness(3);
         this->selection_border_offer.setOutlineColor(sf::Color::Red);
@@ -81,23 +76,23 @@ client::TradeOfferOverlay::TradeOfferOverlay(GameState& game_state) :
         this->selection_border_request.setFillColor(sf::Color::Transparent);
 
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            this->request_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this, TradeParty::REQUEST};
-            this->offer_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this, TradeParty::OFFER};
+            this->request_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this};
+            this->offer_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this};
         }
 }
 
-void client::TradeOfferOverlay::render(GameWindow& game_window, GameState& game_state) {
-    Overlay::render(game_window, game_state);
+void client::TradeOfferOverlay::render(GameWindow& game_window) {
+    Overlay::render(game_window);
 
     if (this->is_active) {
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            this->request_buttons[i].render(game_window, game_state);
+            this->request_buttons[i].render(game_window, this->game_state);
             if (this->request_buttons[i].is_selected()) {
                 this->selection_border_request.setPosition(dimensions.left + i * TRADE_RESOURCE_SPACING + 20.0f, dimensions.top + 100.0f);
                 game_window.draw(this->selection_border_request);
             }
 
-            this->offer_buttons[i].render(game_window, game_state);
+            this->offer_buttons[i].render(game_window, this->game_state);
             if (this->offer_buttons[i].is_selected()) {
                 this->selection_border_offer.setPosition(dimensions.left + i * TRADE_RESOURCE_SPACING + 20.0f, dimensions.top + 160.0f);
                 game_window.draw(this->selection_border_offer);
@@ -106,8 +101,8 @@ void client::TradeOfferOverlay::render(GameWindow& game_window, GameState& game_
     }
 }
 
-void client::TradeOfferOverlay::set_dimensions(GameState& game_state, sf::Rect<int> dimensions) {
-    Overlay::set_dimensions(game_state, dimensions);
+void client::TradeOfferOverlay::set_dimensions(sf::Rect<int> dimensions) {
+    Overlay::set_dimensions(dimensions);
 
     for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
         this->request_buttons[i].set_position(dimensions.left + i * TRADE_RESOURCE_SPACING + 20.0f, dimensions.top + 100.0f);
@@ -115,18 +110,18 @@ void client::TradeOfferOverlay::set_dimensions(GameState& game_state, sf::Rect<i
     }
 }
 
-void client::TradeOfferOverlay::set_active(GameState& game_state, bool state) {
-    Overlay::set_active(game_state, state);
+void client::TradeOfferOverlay::set_active(bool state) {
+    Overlay::set_active(state);
 
     if (state) {
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            game_state.add_clickable_object(&this->request_buttons[i], 0);
-            game_state.add_clickable_object(&this->offer_buttons[i], 0);
+            this->game_state.add_clickable_object(&this->request_buttons[i], 0);
+            this->game_state.add_clickable_object(&this->offer_buttons[i], 0);
         }
     } else {
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            game_state.remove_clickable_object(&this->request_buttons[i]);
-            game_state.remove_clickable_object(&this->offer_buttons[i]);
+            this->game_state.remove_clickable_object(&this->request_buttons[i]);
+            this->game_state.remove_clickable_object(&this->offer_buttons[i]);
         }
     }
 }

@@ -5,19 +5,11 @@
 #include <array>
 #include <cmath>
 
+#include "base/Registry.h"
+
 namespace client {
     class GameState;
     class GameWindow;
-
-    enum HexTileType {
-        DESERT,
-        FIELD,
-        HILL,
-        FOREST,
-        MOUNTAIN,
-        PASTURE,
-        HEX_TILE_MAX
-    };
 
     struct HexTile {
         int x;

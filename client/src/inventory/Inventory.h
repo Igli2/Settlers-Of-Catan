@@ -11,6 +11,7 @@
 #include "Trade.h"
 
 #include "base/Resizable.h"
+#include "base/Registry.h"
 
 #define INV_BORDER_SIZE 5.0f
 #define INV_TOP_HEIGHT 50.0f

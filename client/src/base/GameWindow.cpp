@@ -5,6 +5,8 @@ client::GameWindow::GameWindow(client::GameState& game_state) : sf::RenderWindow
 }
 
 void client::GameWindow::game_loop(client::GameState& game_state) {
+    KeyboardHandler keyboard_handler{game_state};
+
     while (this->isOpen()) {
         sf::Event event;
         while (this->pollEvent(event)) {
@@ -22,29 +24,17 @@ void client::GameWindow::game_loop(client::GameState& game_state) {
             } else if (event.type == sf::Event::MouseMoved) {
                 game_state.call_mouse_move(sf::Vector2i{event.mouseMove.x, event.mouseMove.y});
             } else if (event.type == sf::Event::KeyPressed) {
-                // TODO move to handler or something
-                if (event.key.code == sf::Keyboard::Key::A) {
-                    game_state.get_hexmap().pos += sf::Vector2f{-5.0f, 0.0f};
-                    game_state.map_view.move(-5.0f, 0.0f);
-                }
-                if (event.key.code == sf::Keyboard::Key::D) {
-                    game_state.get_hexmap().pos += sf::Vector2f{5.0f, 0.0f};
-                    game_state.map_view.move(5.0f, 0.0f);
-                }
-                if (event.key.code == sf::Keyboard::Key::W) {
-                    game_state.get_hexmap().pos += sf::Vector2f{0.0f, -5.0f};
-                    game_state.map_view.move(0.0f, -5.0f);
-                }
-                if (event.key.code == sf::Keyboard::Key::S) {
-                    game_state.get_hexmap().pos += sf::Vector2f{0.0f, 5.0f};
-                    game_state.map_view.move(0.0f, 5.0f);
-                }
+                keyboard_handler.on_key_pressed(event.key);
+            } else if(event.type == sf::Event::KeyReleased) {
+                keyboard_handler.on_key_released(event.key);
             } else if (event.type == sf::Event::MouseWheelScrolled) {
                 float zoom = 1.0f - 0.05f * event.mouseWheelScroll.delta;
                 game_state.get_hexmap().zoom *= zoom;
                 game_state.map_view.zoom(zoom);
             }
         }
+
+        keyboard_handler.update_view();
 
         this->clear(sf::Color{120, 120, 220});
 

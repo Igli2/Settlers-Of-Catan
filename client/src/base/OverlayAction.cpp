@@ -19,9 +19,9 @@ client::OverlayAction::OverlayAction(GameState& game_state, Overlay* overlay_p, 
 bool client::OverlayAction::on_click(GameState& game_state, sf::Mouse::Button button) {
     if (button == sf::Mouse::Button::Left) {
         if (this->type == OverlayActionType::ACCEPT) {
-            this->overlay_p->on_accept(game_state);
+            this->overlay_p->on_accept();
         } else {
-            this->overlay_p->on_decline(game_state);
+            this->overlay_p->on_decline();
         }
         return true;
     }

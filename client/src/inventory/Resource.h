@@ -4,18 +4,10 @@
 #include <string>
 
 #include "base/Resizable.h"
+#include "base/Registry.h"
 
 namespace client {
     class GameState;
-
-    enum ResourceType {
-        GRAIN,
-        BRICK,
-        ORE,
-        WOOL,
-        LUMBER,
-        RESOURCE_MAX
-    };
 
     class Resource : public sf::Sprite, public Resizable {
         private:

@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "GameState.h"
+#include "KeyboardHandler.h"
 
 namespace client {
     class GameState;

@@ -34,7 +34,7 @@ void client::GameWindow::game_loop(client::GameState& game_state) {
             }
         }
 
-        keyboard_handler.update_view();
+        keyboard_handler.update_view(game_state.get_hexmap().zoom);
 
         this->clear(sf::Color{120, 120, 220});
 

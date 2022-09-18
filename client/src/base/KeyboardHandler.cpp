@@ -34,21 +34,21 @@ void client::KeyboardHandler::on_key_released(sf::Event::KeyEvent event_paramete
     }
 }
 
-void client::KeyboardHandler::update_view() {
+void client::KeyboardHandler::update_view(const float zoom) {
     if (this->key_states[0]) {
-        this->game_state.get_hexmap().pos += sf::Vector2f{0.0f, -MOVEMENT_SPEED};
-        this->game_state.map_view.move(0.0f, -MOVEMENT_SPEED);
+        this->game_state.get_hexmap().pos += sf::Vector2f{0.0f, -MOVEMENT_SPEED * zoom};
+        this->game_state.map_view.move(0.0f, -MOVEMENT_SPEED * zoom);
     }
     if (this->key_states[1]) {
-        game_state.get_hexmap().pos += sf::Vector2f{-MOVEMENT_SPEED, 0.0f};
-        game_state.map_view.move(-MOVEMENT_SPEED, 0.0f);
+        game_state.get_hexmap().pos += sf::Vector2f{-MOVEMENT_SPEED * zoom, 0.0f};
+        game_state.map_view.move(-MOVEMENT_SPEED * zoom, 0.0f);
     }
     if (this->key_states[2]) {
-        game_state.get_hexmap().pos += sf::Vector2f{0.0f, MOVEMENT_SPEED};
-        game_state.map_view.move(0.0f, MOVEMENT_SPEED);
+        game_state.get_hexmap().pos += sf::Vector2f{0.0f, MOVEMENT_SPEED * zoom};
+        game_state.map_view.move(0.0f, MOVEMENT_SPEED * zoom);
     }
     if (this->key_states[3]) {
-        game_state.get_hexmap().pos += sf::Vector2f{MOVEMENT_SPEED, 0.0f};
-        game_state.map_view.move(MOVEMENT_SPEED, 0.0f);
+        game_state.get_hexmap().pos += sf::Vector2f{MOVEMENT_SPEED * zoom, 0.0f};
+        game_state.map_view.move(MOVEMENT_SPEED * zoom, 0.0f);
     }
 }

@@ -14,6 +14,6 @@ namespace client {
             KeyboardHandler(GameState& game_state);
             void on_key_pressed(sf::Event::KeyEvent event_parameters);
             void on_key_released(sf::Event::KeyEvent event_parameters);
-            void update_view();
+            void update_view(const float zoom);
     };
 }

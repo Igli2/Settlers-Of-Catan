@@ -41,6 +41,7 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
 client::GameState::~GameState() {
     this->socket.send(network::Packet{1, "CLOSE CONNECTION; BYE BYE :3\n"});
     this->is_open = false;
+    this->socket.disconnect();
     // wait 1 second before disconnect?
     // this->socket.disconnect();
     this->receive_thread.join();

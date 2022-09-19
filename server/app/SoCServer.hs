@@ -3,13 +3,25 @@
 module Main where
 
 import Network.Socket
-import System.IO
 import Control.Concurrent
 import Control.Monad.Fix (fix)
 import Control.Monad (when)
 import Control.Exception (handle, SomeException (SomeException))
+import Network.Socket.ByteString (send, sendAll)
+import qualified Data.ByteString.Char8 as BS8
+import qualified Network.Socket.ByteString as NBS8
+import Data.Binary (encode)
+import Data.Int
+import qualified Data.ByteString.Lazy.Char8 as BSL8
+import qualified Network.Socket.ByteString.Lazy as NBSL8
 
-type Packet = String
+
+import PacketHandler
+import Data.Binary.Get (runGet)
+import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering), hGetContents, hClose, hPutStr, hFlush)
+import qualified Network.Socket.ByteString.Lazy as NBS8
+import Data.Binary.Put (runPut)
+import qualified Data.ByteString as BSL
 
 serverPort :: PortNumber
 serverPort = 50140
@@ -17,17 +29,17 @@ serverPort = 50140
 main :: IO ()
 main = do
     sock <- socket AF_INET Stream 0
-    broadcastChan <- newChan
-    incomingChan <- newChan
-    
+    broadcastChan <- newChan :: IO (Chan Packet)
+    incomingChan <- newChan :: IO (Chan Packet)
+
     setSocketOption sock ReuseAddr 1
     bind sock (SockAddrInet serverPort 0)
     listen sock 4
 
     packetSender <- forkIO . fix $  \loop -> do
-        msg <- readChan incomingChan
-        writeChan broadcastChan msg
-        putStrLn $ "Received packet: " ++ msg
+        toSend <- readChan incomingChan
+        writeChan broadcastChan toSend
+        putStrLn $ "Received packet: " ++ show toSend
         loop
 
     broadcastClearer <- forkIO . fix $ \loop -> do
@@ -55,19 +67,18 @@ handleConnection (sock, addr) broadcastChan incomingChan = do
 
     listenerChan <- dupChan broadcastChan
     listener <- forkIO . fix $ \loop -> do
-        msg <- readChan listenerChan
-        hPutStrLn hdl $ "Received: " ++ msg
+        toSend <- readChan listenerChan
+        hPutStr hdl (BSL8.unpack . runPut $  putPacket toSend)
         loop
 
     handle (\(SomeException _) -> return ()) . fix $ \loop -> do
-        line <- fmap init . hGetLine $ hdl
-        case line of
-            "quit"  -> return ()
-            _       -> broadcast line >> loop
+        packet <- parsePacket hdl 
+        case packetType packet of
+            0  -> return ()
+            _   -> broadcast packet >> loop
 
     killThread listener
-    hClose hdl
-    
+
     putStrLn $ "Client with ip " ++ show addr ++ " disconnected"
 
     where broadcast msg = writeChan incomingChan msg

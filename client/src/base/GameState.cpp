@@ -7,14 +7,14 @@ client::GameState::GameState() :
     last_hovered{nullptr},
     socket{network::Socket::SocketType::TCP},
     is_open{true} {
-        /*socket.connect("192.168.178.34", 50140);
+        socket.connect("192.168.178.34", 50140);
         if (socket.get_status() == network::Socket::SocketStatus::ERROR) {
             throw std::runtime_error("Socket connect failed, server offline?");
         }
 
         this->receive_thread = std::thread{this->receive_packets, this, &this->socket};
 
-        socket.send(network::Packet{0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP\n"});*/
+        socket.send(network::Packet{1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP"});
 }
 
 void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {
@@ -22,7 +22,9 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
     while(game_state->is_open) {
         packet = socket->receive_packet();
         if (socket->get_status() == network::Socket::SocketStatus::ERROR) {
-            throw std::runtime_error("Cannot receive packet");
+            if(game_state->is_open) throw std::runtime_error("Cannot receive packet"); // only throw when we are not in the destructor
+
+            return;
         }
         std::cout << (int)packet.packet_type << ": " << packet.data << std::endl;
         // handle packet
@@ -31,7 +33,7 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
                 // GIMME DA TILEMAP
                 break;
             case 1:
-                return;
+                break;
             default:
                 break;
         }
@@ -39,7 +41,7 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
 }
 
 client::GameState::~GameState() {
-    this->socket.send(network::Packet{1, "CLOSE CONNECTION; BYE BYE :3\n"});
+    this->socket.send(network::Packet{1, "CLOSE CONNECTION; BYE BYE :3"});
     this->is_open = false;
     // wait 1 second before disconnect?
     // this->socket.disconnect();

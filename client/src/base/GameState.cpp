@@ -7,14 +7,14 @@ client::GameState::GameState() :
     last_hovered{nullptr},
     socket{network::Socket::SocketType::TCP},
     is_open{true} {
-        socket.connect("192.168.178.34", 50140);
+        /*socket.connect("192.168.178.34", 50140);
         if (socket.get_status() == network::Socket::SocketStatus::ERROR) {
             throw std::runtime_error("Socket connect failed, server offline?");
         }
 
         this->receive_thread = std::thread{this->receive_packets, this, &this->socket};
 
-        socket.send(network::Packet{0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP\n"});
+        socket.send(network::Packet{0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP\n"});*/
 }
 
 void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {

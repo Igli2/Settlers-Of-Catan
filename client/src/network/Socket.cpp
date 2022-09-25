@@ -128,7 +128,7 @@ network::Packet network::Socket::receive_packet() {
     received.packet_type = *(uint8_t*)this->receive(sizeof(uint8_t), false).c_str();
     if(this->get_status() == SocketStatus::ERROR) return {};
 
-    uint64_t packet_length = *(uint64_t*)this->receive(sizeof(uint64_t), false).c_str();
+    uint64_t packet_length = be64toh(*(uint64_t*)this->receive(sizeof(uint64_t), false).c_str());
     if(this->get_status() == SocketStatus::ERROR) return {};
     
     received.data = std::move(this->receive(packet_length, false));

@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <utility>
+#include <endian.h>
 #include <algorithm>
 
 //static
@@ -14,7 +15,7 @@ const short network::Socket::MAX_BUFFER_LENGTH = 4096;
 //public
 
 std::string network::Packet::to_bytes() const {
-    const uint64_t packet_length = (uint64_t)this->data.size();
+    const uint64_t packet_length = htobe64((uint64_t)this->data.size());
     std::string binary_packet;
 
     binary_packet.insert(0, (const char*)&this->packet_type, sizeof(uint8_t));

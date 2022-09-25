@@ -7,7 +7,7 @@ module PacketHandler (
 ) where
 
 import Data.Int (Int8, Int64)
-import Data.Binary.Get (getInt64le, getInt8, runGet, getByteString, Get)
+import Data.Binary.Get (getInt64be, getInt8, runGet, getByteString, Get)
 import Data.Binary (encode, Put)
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString as BS (ByteString, length, empty)
@@ -29,7 +29,7 @@ instance Exception SocketException
 getPacket :: Get Packet
 getPacket = do
     packetID <- getInt8
-    packet_length <- getInt64le
+    packet_length <- getInt64be
     packetData <- BS8.unpack <$> getByteString (fromIntegral packet_length)
 
     return $! Packet packetID packetData
@@ -38,7 +38,7 @@ parsePacket :: Handle -> IO Packet
 parsePacket hdl = do
     packetIDBS <- BS8.hGet hdl 1
     packetLengthBS <- BS8.hGet hdl 8
-    let packetLength = fromIntegral $ runGet getInt64le . BSL.fromStrict $ packetLengthBS
+    let packetLength = fromIntegral $ runGet getInt64be . BSL.fromStrict $ packetLengthBS
     packetDataBS <- BS8.hGet hdl packetLength
 
     return $ runGet getPacket $ BSL.fromStrict (packetIDBS <> packetLengthBS <> packetDataBS)

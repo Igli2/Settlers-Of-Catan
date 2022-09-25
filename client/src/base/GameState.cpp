@@ -1,17 +1,12 @@
 #include "GameState.h"
 
-client::GameState::GameState() :
+client::GameState::GameState(network::Socket& socket) :
     window_size{500, 500},
     inventory{*this},
     last_mouse_pressed{-1, -1},
     last_hovered{nullptr},
-    socket{network::Socket::SocketType::TCP},
+    socket{socket},
     is_open{true} {
-        socket.connect("192.168.178.34", 50140);
-        if (socket.get_status() == network::Socket::SocketStatus::ERROR) {
-            throw std::runtime_error("Socket connect failed, server offline?");
-        }
-
         this->receive_thread = std::thread{this->receive_packets, this, &this->socket};
 
         socket.send(network::Packet{1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ GIMME DA TILEMAP"});

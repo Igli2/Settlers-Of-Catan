@@ -27,14 +27,14 @@ namespace client {
             Clickable* last_hovered;
             Inventory inventory;
             HexMap hex_map;
-            network::Socket socket;
+            network::Socket& socket;
             std::thread receive_thread;
         public:
             sf::View inventory_view;
             sf::View map_view;
             bool is_open;
 
-            GameState();
+            GameState(network::Socket& socket);
             ~GameState();
             const TextureManager& get_texture_manager();
             const sf::Vector2u& get_window_size();

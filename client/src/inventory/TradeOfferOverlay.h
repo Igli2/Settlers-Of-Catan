@@ -8,7 +8,7 @@
 
 #include "base/Overlay.h"
 #include "base/Clickable.h"
-#include "base/Registry.h"
+#include "base/registry.h"
 
 namespace client {
     class GameState;

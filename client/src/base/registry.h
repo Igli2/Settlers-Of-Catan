@@ -39,4 +39,19 @@ namespace client {
         "wool",
         "lumber"
     };
+
+    enum BuildingType {
+        BUILDING_NONE,
+        ROAD,
+        SETTLEMENT,
+        CITY,
+        BUILDING_MAX
+    };
+
+    const std::array<std::string, client::BuildingType::BUILDING_MAX> building_texture_names = {
+        "",
+        "building_road",
+        "building_settlement",
+        "building_city"
+    };
 }

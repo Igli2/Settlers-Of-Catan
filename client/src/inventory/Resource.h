@@ -4,7 +4,7 @@
 #include <string>
 
 #include "base/Resizable.h"
-#include "base/Registry.h"
+#include "base/registry.h"
 
 namespace client {
     class GameState;

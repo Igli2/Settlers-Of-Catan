@@ -6,7 +6,10 @@
 client::Inventory::Inventory(GameState& game_state) : Resizable{game_state}, victory_point{game_state}, trade{game_state} {
     for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
         this->resources[i].init(game_state, (ResourceType)i);
-        this->resources[i].setTexture(game_state.get_texture_manager().get_texture(resource_texture_names[i]));
+    }
+
+    for (int i = 0; i < BuildingType::BUILDING_MAX - 1; i++) {
+        this->buildings[i].init(game_state, (BuildingType)(i + 1));
     }
 
     this->background[0].setFillColor(sf::Color{61, 33, 9});
@@ -30,7 +33,6 @@ client::Inventory::Inventory(GameState& game_state) : Resizable{game_state}, vic
 client::Inventory::~Inventory() {
     for (DevelopmentCard* dc : this->development_cards) {
         delete dc;
-        dc = nullptr;
     }
 }
 
@@ -46,6 +48,10 @@ void client::Inventory::render(GameWindow& game_window, GameState& game_state) {
 
     for (client::DevelopmentCard* dc : this->development_cards) {
         game_window.draw(*dc);
+    }
+
+    for (BuildButton& button : this->buildings) {
+        game_window.draw(button);
     }
 
     game_window.draw(this->victory_point.get_sprite());
@@ -79,6 +85,13 @@ void client::Inventory::on_resize(GameState& game_state) {
     for (int x = 0; x < this->resources.size(); x++) {
         this->resources[x].setPosition(resource_pos_x + x * 100.0f, resource_pos_y);
         this->resources[x].get_render_text().setPosition(resource_pos_x + x * 100.0f + 45.0f, resource_pos_y + 6.0f);
+    }
+
+    float building_pos_x = window_width - INV_BORDER_SIZE * 4.0f;
+    float building_pos_y = resource_pos_y;
+    for (int x = 0; x < this->buildings.size(); x++) {
+        this->buildings[x].setPosition(building_pos_x - (x + 1) * 50.0f, building_pos_y);
+        this->buildings[x].set_area(sf::Rect<int>{(int)(building_pos_x - (x + 1) * 50.0f), (int)building_pos_y, 40, 40});
     }
 
     int i = 0;

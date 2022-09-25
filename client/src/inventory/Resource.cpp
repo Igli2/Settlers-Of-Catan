@@ -11,6 +11,8 @@ void client::Resource::init(GameState& game_state, client::ResourceType type) {
     this->text.setCharacterSize(22);
     this->type = type;
 
+    this->setTexture(game_state.get_texture_manager().get_texture(resource_texture_names[this->type]));
+
     game_state.add_resizable_object(this);
 }
 

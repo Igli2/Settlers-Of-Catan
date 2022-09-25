@@ -115,13 +115,13 @@ void client::TradeOfferOverlay::set_active(bool state) {
 
     if (state) {
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            this->game_state.add_clickable_object(&this->request_buttons[i], 0);
-            this->game_state.add_clickable_object(&this->offer_buttons[i], 0);
+            this->game_state.get_mouse_handler().add_clickable_object(&this->request_buttons[i], 0);
+            this->game_state.get_mouse_handler().add_clickable_object(&this->offer_buttons[i], 0);
         }
     } else {
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            this->game_state.remove_clickable_object(&this->request_buttons[i]);
-            this->game_state.remove_clickable_object(&this->offer_buttons[i]);
+            this->game_state.get_mouse_handler().remove_clickable_object(&this->request_buttons[i]);
+            this->game_state.get_mouse_handler().remove_clickable_object(&this->offer_buttons[i]);
         }
     }
 }

@@ -5,7 +5,7 @@
 client::Clickable::Clickable(sf::Rect<int> area) : click_area{area} {}
 
 client::Clickable::Clickable(GameState& game_state, sf::Rect<int> area) : click_area{area} {
-    game_state.add_clickable_object(this);
+    game_state.get_mouse_handler().add_clickable_object(this);
 }
 
 bool client::Clickable::contains(const sf::Vector2i& point) {

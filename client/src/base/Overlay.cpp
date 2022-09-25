@@ -35,13 +35,13 @@ void client::Overlay::render(GameWindow& game_window) {
 
 void client::Overlay::set_active(bool state) {
     if (state) {
-        this->game_state.add_clickable_object(this, 0);
-        this->game_state.add_clickable_object(&this->accept, 0);
-        this->game_state.add_clickable_object(&this->decline, 0);
+        this->game_state.get_mouse_handler().add_clickable_object(this, 0);
+        this->game_state.get_mouse_handler().add_clickable_object(&this->accept, 0);
+        this->game_state.get_mouse_handler().add_clickable_object(&this->decline, 0);
     } else {
-        this->game_state.remove_clickable_object(this);
-        this->game_state.remove_clickable_object(&this->accept);
-        this->game_state.remove_clickable_object(&this->decline);
+        this->game_state.get_mouse_handler().remove_clickable_object(this);
+        this->game_state.get_mouse_handler().remove_clickable_object(&this->accept);
+        this->game_state.get_mouse_handler().remove_clickable_object(&this->decline);
     }
     this->is_active = state;
 }

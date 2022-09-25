@@ -32,7 +32,7 @@ client::DevelopmentCard::DevelopmentCard(GameState& game_state, DevelopmentCardT
 
 bool client::DevelopmentCard::on_click(GameState& game_state, sf::Mouse::Button button) {
     // delete all pointers to this and commit suicide
-    game_state.remove_clickable_object(this);
+    game_state.get_mouse_handler().remove_clickable_object(this);
     game_state.get_inventory().remove_development_card(game_state, this);
     delete this;
     return true;

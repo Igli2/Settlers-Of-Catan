@@ -17,6 +17,7 @@ namespace client {
             virtual bool on_release(GameState& game_state, sf::Mouse::Button button) { return false; } // mouse button up
             virtual bool on_enter(GameState& game_state) { return false; } // mouse move event into area
             virtual bool on_exit(GameState& game_state) { return false; } // mouse move out of area
+            virtual bool on_move(GameState& game_state) { return false; } // any move inside of area
             bool contains(const sf::Vector2i& point);
             void set_area(sf::Rect<int> rect);
     };

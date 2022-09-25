@@ -18,6 +18,7 @@ set(CLIENT_SOURCE_FILES
     src/base/Overlay.cpp
     src/base/OverlayAction.cpp
     src/base/KeyboardHandler.cpp
+    src/base/MouseHandler.cpp
 
     src/inventory/Inventory.cpp
     src/inventory/DevelopmentCard.cpp
@@ -25,6 +26,7 @@ set(CLIENT_SOURCE_FILES
     src/inventory/VictoryPoint.cpp
     src/inventory/Trade.cpp
     src/inventory/TradeOfferOverlay.cpp
+    src/inventory/BuildButton.cpp
 
     src/map/HexMap.cpp
 

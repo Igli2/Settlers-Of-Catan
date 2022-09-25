@@ -9,9 +9,10 @@
 #include "DevelopmentCard.h"
 #include "VictoryPoint.h"
 #include "Trade.h"
+#include "BuildButton.h"
 
 #include "base/Resizable.h"
-#include "base/Registry.h"
+#include "base/registry.h"
 
 #define INV_BORDER_SIZE 5.0f
 #define INV_TOP_HEIGHT 50.0f
@@ -24,6 +25,7 @@ namespace client {
         private:
             std::array<sf::RectangleShape, 5> background;
             std::array<Resource, ResourceType::RESOURCE_MAX> resources;
+            std::array<BuildButton, BuildingType::BUILDING_MAX - 1> buildings;
             std::vector<DevelopmentCard*> development_cards; // delete manually when removed
             VictoryPoint victory_point;
             Trade trade;

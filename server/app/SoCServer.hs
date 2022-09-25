@@ -5,23 +5,11 @@ module Main where
 import Network.Socket
 import Control.Concurrent
 import Control.Monad.Fix (fix)
-import Control.Monad (when)
 import Control.Exception (handle, SomeException (SomeException))
-import Network.Socket.ByteString (send, sendAll)
-import qualified Data.ByteString.Char8 as BS8
-import qualified Network.Socket.ByteString as NBS8
-import Data.Binary (encode)
-import Data.Int
 import qualified Data.ByteString.Lazy.Char8 as BSL8
-import qualified Network.Socket.ByteString.Lazy as NBSL8
-
-
-import PacketHandler
-import Data.Binary.Get (runGet)
-import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering), hGetContents, hClose, hPutStr, hFlush)
-import qualified Network.Socket.ByteString.Lazy as NBS8
+import PacketHandler (Packet(packetType), parsePacket, putPacket)
+import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering), hClose, hPutStr)
 import Data.Binary.Put (runPut)
-import qualified Data.ByteString as BSL
 
 serverPort :: PortNumber
 serverPort = 50140

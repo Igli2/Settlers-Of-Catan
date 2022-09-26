@@ -6,8 +6,7 @@ import Network.Socket
 import Control.Concurrent
 import Control.Monad.Fix (fix)
 import Control.Exception (handle, SomeException (SomeException))
-import qualified Data.ByteString.Lazy.Char8 as BSL8
-import PacketHandler (Packet(packetType), parsePacket, putPacket)
+import PacketHandler (Packet(packetType), parsePacket, sendPacket)
 import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering), hClose, hPutStr)
 import Data.Binary.Put (runPut)
 
@@ -56,7 +55,7 @@ handleConnection (sock, addr) broadcastChan incomingChan = do
     listenerChan <- dupChan broadcastChan
     listener <- forkIO . fix $ \loop -> do
         toSend <- readChan listenerChan
-        hPutStr hdl (BSL8.unpack . runPut $  putPacket toSend)
+        sendPacket toSend hdl
         loop
 
     handle (\(SomeException _) -> return ()) . fix $ \loop -> do

@@ -6,15 +6,23 @@ import Network.Socket
 import Control.Concurrent
 import Control.Monad.Fix (fix)
 import Control.Exception (handle, SomeException (SomeException))
-import PacketHandler (Packet(packetType), parsePacket, sendPacket)
 import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering), hClose, hPutStr)
 import Data.Binary.Put (runPut)
+
+import ConfigLoader
+import PacketHandler (Packet(packetType), parsePacket, sendPacket)
 
 serverPort :: PortNumber
 serverPort = 50140
 
 main :: IO ()
 main = do
+    socCfg <- parseConfig "config.yml" :: IO GameConfig
+    mapCfg <- parseConfig (mapFile  socCfg) :: IO MapConfig
+
+    print socCfg
+    print mapCfg
+
     sock <- socket AF_INET Stream 0
     broadcastChan <- newChan :: IO (Chan Packet)
     incomingChan <- newChan :: IO (Chan Packet)

@@ -1,14 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module ConfigLoader (
-    GameConfig,
-    MapConfig,
-    SOCMap,
-    createMapFromConfig,
+    GameConfig(..),
+    MapConfig(..),
+    TileConfig,
     parseConfig,
-    requiredVictoryPoints,
-    minCardsForRobbery,
-    mapFile
 ) where
 
 import Data.Yaml
@@ -17,13 +13,15 @@ import Data.Maybe (fromJust)
 import qualified Data.Map as Map
 import Control.Exception (throw)
 
-data TileConfig = TileConfig {
-    x :: !Int,
-    y :: !Int,
-    tile :: !String
-} deriving (Show, Generic)
+-- data TileConfig = TileConfig {
+    -- x :: !Int,
+    -- y :: !Int,
+    -- tile :: !String
+-- } deriving (Show, Generic)
+-- 
+-- instance FromJSON TileConfig
 
-instance FromJSON TileConfig
+type TileConfig = ((Int, Int), String)
 
 data MapConfig = MapConfig {
     width :: !Int,
@@ -41,13 +39,6 @@ data GameConfig = GameConfig {
 } deriving (Show, Generic)
 
 instance FromJSON GameConfig
-
-type SOCMap = Map.Map (Int, Int) String
-
---TODO
-createMapFromConfig :: MapConfig -> SOCMap
-createMapFromConfig (MapConfig w l fT tiles) = undefined
-    where tileConfigToMapPair (TileConfig x y tile) = undefined
 
 parseConfig :: FromJSON a => FilePath -> IO a
 parseConfig path = do

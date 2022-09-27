@@ -10,7 +10,9 @@ import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering)
 import Data.Binary.Put (runPut)
 
 import ConfigLoader
+
 import PacketHandler (Packet(packetType), parsePacket, sendPacket)
+import SOCMap (createMapFromConfig)
 
 serverPort :: PortNumber
 serverPort = 50140
@@ -19,9 +21,11 @@ main :: IO ()
 main = do
     socCfg <- parseConfig "config.yml" :: IO GameConfig
     mapCfg <- parseConfig (mapFile  socCfg) :: IO MapConfig
+    let socMap = createMapFromConfig mapCfg
 
     print socCfg
     print mapCfg
+    print socMap
 
     sock <- socket AF_INET Stream 0
     broadcastChan <- newChan :: IO (Chan Packet)

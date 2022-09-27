@@ -28,6 +28,7 @@ executable server
     other-modules:    ConfigLoader
                       PacketHandler
                       SOCMap
+                      PacketResponses
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

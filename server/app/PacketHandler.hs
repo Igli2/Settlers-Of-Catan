@@ -1,9 +1,7 @@
 module PacketHandler (
-    Packet,
+    Packet(..),
     parsePacket,
     sendPacket,
-    packetData,
-    packetType
 ) where
 
 import qualified Data.ByteString.Char8 as BS8

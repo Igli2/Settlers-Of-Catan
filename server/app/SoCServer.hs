@@ -12,7 +12,8 @@ import Data.Binary.Put (runPut)
 import ConfigLoader
 
 import PacketHandler (Packet(packetType), parsePacket, sendPacket)
-import SOCMap (createMapFromConfig)
+import SOCMap (createMapFromConfig, SOCMap)
+import PacketResponses (sendTileMapPackets)
 
 serverPort :: PortNumber
 serverPort = 50140
@@ -21,11 +22,7 @@ main :: IO ()
 main = do
     socCfg <- parseConfig "config.yml" :: IO GameConfig
     mapCfg <- parseConfig (mapFile  socCfg) :: IO MapConfig
-    let socMap = createMapFromConfig mapCfg
-
-    print socCfg
-    print mapCfg
-    print socMap
+    let socM = createMapFromConfig mapCfg
 
     sock <- socket AF_INET Stream 0
     broadcastChan <- newChan :: IO (Chan Packet)
@@ -45,20 +42,20 @@ main = do
         _ <- readChan  broadcastChan
         loop
 
-    serverLoop sock broadcastChan incomingChan
+    serverLoop sock broadcastChan incomingChan socM
 
     killThread packetSender
     killThread broadcastClearer
 
-serverLoop :: Socket -> Chan Packet -> Chan Packet -> IO ()
-serverLoop sock broadcastChan incomingChan = do
+serverLoop :: Socket -> Chan Packet -> Chan Packet -> SOCMap -> IO ()
+serverLoop sock broadcastChan incomingChan socM = do
     connection <- accept sock
-    forkIO (handleConnection connection broadcastChan incomingChan)
+    forkIO (handleConnection connection broadcastChan incomingChan socM)
 
-    serverLoop sock broadcastChan incomingChan
+    serverLoop sock broadcastChan incomingChan socM
 
-handleConnection :: (Socket, SockAddr) -> Chan Packet -> Chan Packet -> IO ()
-handleConnection (sock, addr) broadcastChan incomingChan = do
+handleConnection :: (Socket, SockAddr) -> Chan Packet -> Chan Packet -> SOCMap -> IO ()
+handleConnection (sock, addr) broadcastChan incomingChan socM = do
     hdl <- socketToHandle sock ReadWriteMode
     hSetBuffering hdl NoBuffering
 
@@ -74,6 +71,7 @@ handleConnection (sock, addr) broadcastChan incomingChan = do
         packet <- parsePacket hdl 
         case packetType packet of
             0  -> return ()
+            2 -> sendTileMapPackets socM hdl >> loop
             _   -> broadcast packet >> loop
 
     killThread listener

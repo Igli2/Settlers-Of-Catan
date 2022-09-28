@@ -3,7 +3,8 @@
 namespace network {
     enum PacketType {
         DISCONNECT,
+        REGISTER_PLAYER,
         GET_TILEMAP,
-        TRADE_OFFER
+        TILE_DATA
     };
 }

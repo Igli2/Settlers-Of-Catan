@@ -10,15 +10,29 @@ client::HexMap::HexMap(GameState& game_state) :
     Resizable{game_state},
     currently_building{BuildingType::BUILDING_NONE},
     game_state{game_state} {
-        for (int i = 0; i < this->size.x; i++) {
-            for (int j = 0; j < this->size.y - std::abs(i - this->size.y / 2); j++) {
-                this->tilemap.push_back(HexTile{j, i, (HexTileType)(i + 1)});
-            }
-        }
         this->hex_shape.setPointCount(6);
         this->hex_shape.setRadius(HEX_SIZE / 2.0f);
         this->marker.setPosition(sf::Vector2f{-100000.0f, -100000.0f});
         this->marker.setTexture(game_state.get_texture_manager().get_texture(building_texture_names[this->currently_building]));
+}
+
+void client::HexMap::add_tile(std::string tile_packet) {
+    std::stringstream ss{tile_packet};
+    int x, y;
+    std::string tilename;
+    ss >> x >> y >> tilename;
+    std::cout << x << std::endl;
+    std::cout << y << std::endl;
+    std::cout << tilename << std::endl;
+    if (tilename != "water") {
+        this->tilemap.push_back(HexTile{x, y, tile_name_to_id(tilename)});
+    } else {
+        this->tilemap.push_back(HexTile{x, y, HexTileType::DESERT});
+    }
+}
+
+client::HexTileType client::HexMap::tile_name_to_id(std::string name) {
+    return tile_name_ids.at(name);
 }
 
 void client::HexMap::render(GameWindow& game_window, GameState& game_state) {
@@ -82,6 +96,9 @@ bool client::HexMap::on_move(GameState& game_state) {
             corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos);
             this->marker.setPosition(corner - sf::Vector2f{25.0f, 25.0f});
             return true;
+        case BuildingType::CITY:
+            break;
+            // get corner, check if settlement is placed
         default:
             return false;
     }
@@ -109,8 +126,7 @@ client::HexTile* client::HexMap::pixel_to_hex(sf::Vector2f pos) {
     float yf = (2.0f / 3.0f * pos.y) / (HEX_SIZE / 2.0f);
     // round coords
     sf::Vector2i hex_coords = this->cube_to_axial(this->cube_round(this->axial_to_cube(sf::Vector2f{xf, yf})));
-    // offset for settlers coord system
-    hex_coords.x = hex_coords.y > this->size.y / 2 ? hex_coords.x + this->size.y / 2 : hex_coords.x + hex_coords.y;
+    hex_coords.x = hex_coords.x + (hex_coords.y + (hex_coords.y & 1)) / 2; // convert from axial coords to offset coords
 
     for (HexTile& tile : this->tilemap) {
         if (tile.x == hex_coords.x && tile.y == hex_coords.y) {
@@ -121,7 +137,7 @@ client::HexTile* client::HexMap::pixel_to_hex(sf::Vector2f pos) {
 }
 
 sf::Vector2f client::HexMap::hex_to_pixel(const HexTile& tile) {
-    int tile_x = tile.y > this->size.y / 2 ? tile.x - this->size.y / 2 : tile.x - tile.y;
+    int tile_x = tile.x - (tile.y + (tile.y & 1)) / 2; // convert from offset coords to axial coords
     float pixel_x = (HEX_SIZE / 2.0f) * (std::sqrt(3.0f) * tile_x + std::sqrt(3.0f) / 2.0f * tile.y);
     float pixel_y = (HEX_SIZE / 2.0f) * (3.0f / 2.0f * tile.y);
     return sf::Vector2f{pixel_x, pixel_y};

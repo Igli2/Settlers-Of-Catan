@@ -36,6 +36,7 @@ namespace client {
             sf::Vector3f axial_to_cube(sf::Vector2f axial);
             sf::Vector3i cube_round(sf::Vector3f cube);
             sf::Vector2f get_closest_corner(sf::Vector2f mid, sf::Vector2f pos);
+            client::HexTileType tile_name_to_id(std::string name);
         public:
             sf::Vector2f pos;
             float zoom;
@@ -47,5 +48,6 @@ namespace client {
             bool on_move(GameState& game_state) override;
             void place(BuildingType type);
             void set_game_window(GameWindow* game_window);
+            void add_tile(std::string tile_packet);
     };
 }

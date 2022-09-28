@@ -9,7 +9,7 @@ client::GameState::GameState(network::Socket& socket) :
     socket{socket} {
         this->receive_thread = std::thread{GameState::receive_packets, this, &this->socket};
 
-        socket.send(network::Packet{1, "GIMME DA TILEMAP"});
+        socket.send(network::Packet{2, "GET TILEMAP"});
 }
 
 void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {
@@ -26,11 +26,8 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
             case network::PacketType::DISCONNECT:
                 game_state->is_open = false;
                 break;
-            case network::PacketType::GET_TILEMAP:
-                // parse tilemap data
-                break;
-            case network::PacketType::TRADE_OFFER:
-                // accepted or declined
+            case network::PacketType::TILE_DATA:
+                game_state->get_hexmap().add_tile(packet.data);
                 break;
             default:
                 break;

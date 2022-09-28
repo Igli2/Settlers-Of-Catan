@@ -54,4 +54,13 @@ namespace client {
         "building_settlement",
         "building_city"
     };
+
+    const std::map<std::string, client::HexTileType> tile_name_ids = {
+        {"desert", client::HexTileType::DESERT},
+        {"ore", client::HexTileType::MOUNTAIN},
+        {"corn", client::HexTileType::FIELD},
+        {"brick", client::HexTileType::HILL},
+        {"lumber", client::HexTileType::FOREST},
+        {"wool", client::HexTileType::PASTURE}
+    };
 }

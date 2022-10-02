@@ -21,13 +21,8 @@ void client::HexMap::add_tile(std::string tile_packet) {
     int x, y;
     std::string tilename;
     ss >> x >> y >> tilename;
-    std::cout << x << std::endl;
-    std::cout << y << std::endl;
-    std::cout << tilename << std::endl;
     if (tilename != "water") {
         this->tilemap.push_back(HexTile{x, y, tile_name_to_id(tilename)});
-    } else {
-        this->tilemap.push_back(HexTile{x, y, HexTileType::DESERT});
     }
 }
 

@@ -28,6 +28,8 @@ set(CLIENT_SOURCE_FILES
     src/inventory/TradeOfferOverlay.cpp
     src/inventory/BuildButton.cpp
 
+    src/launcher/LauncherWindow.cpp
+
     src/map/HexMap.cpp
 
     src/network/Socket.cpp

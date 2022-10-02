@@ -20,7 +20,6 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
             std::cout << "Error in packet, sync problems may occur" << std::endl;
             continue;
         }
-        std::cout << (network::PacketType)packet.packet_type << ": " << packet.data << std::endl;
         // handle packet
         switch (packet.packet_type) {
             case network::PacketType::DISCONNECT:
@@ -30,6 +29,7 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
                 game_state->get_hexmap().add_tile(packet.data);
                 break;
             default:
+                std::cout << (network::PacketType)packet.packet_type << ": " << packet.data << std::endl;
                 break;
         }
     }

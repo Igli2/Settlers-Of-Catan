@@ -36,6 +36,11 @@ void client::HexMap::render(GameWindow& game_window, GameState& game_state) {
         this->hex_shape.setPosition(this->hex_to_pixel(tile) - sf::Vector2f{100.0f, 100.0f}); // offset as position is top left, not mid
         game_window.draw(this->hex_shape);
     }
+    for (const BuildingData& bd : this->buildings) {
+        this->building.setTexture(game_state.get_texture_manager().get_texture(building_texture_names[bd.type]));
+        this->building.setPosition(this->corner_to_pixel(bd) - sf::Vector2f{25.0f, 25.0f});
+        game_window.draw(this->building);
+    }
     if (this->currently_building != BuildingType::BUILDING_NONE) {
         game_window.draw(this->marker);
     }
@@ -51,22 +56,53 @@ void client::HexMap::on_resize(GameState& game_state) {
 }
 
 bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
-    if (this->currently_building != BuildingType::BUILDING_NONE) {
-        sf::Vector2i pixel_pos = sf::Mouse::getPosition(*this->game_window);
-        // while building, only clicks in upper part are allowed
-        if (pixel_pos.y > game_state.get_window_size().y / 3.0 * 2.0) {
-            return true;
-        }
-        if (button == sf::Mouse::Button::Right || button == sf::Mouse::Button::Middle) {
-            this->currently_building = BuildingType::BUILDING_NONE;
-            return true;
-        }
-        // TODO
-        // get closest corner for settlement
-        // send place packet
+    if (this->currently_building == BuildingType::BUILDING_NONE) {
+        return false;
+    }
+
+    sf::Vector2i pixel_pos = sf::Mouse::getPosition(*this->game_window);
+    sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, game_state.map_view);
+
+    // while building, only clicks in upper part are allowed
+    if (pixel_pos.y > game_state.get_window_size().y / 3.0 * 2.0) {
         return true;
     }
-    return false;
+    if (button == sf::Mouse::Button::Right || button == sf::Mouse::Button::Middle) {
+        this->currently_building = BuildingType::BUILDING_NONE;
+        return true;
+    }
+    
+    // TODO: send place packet
+    HexTile* tile = this->pixel_to_hex(world_pos);
+    if (tile == nullptr) {
+        this->marker.setPosition(sf::Vector2f{-100000.0f, -100000.0f});
+        return true;
+    }
+    sf::Vector2i corner;
+    switch (this->currently_building) {
+        case BuildingType::SETTLEMENT:
+            // validate
+            corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos, *tile);
+            if (!this->can_place_settlement(corner)) {
+                break;
+            }
+            // place
+            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::SETTLEMENT});
+            this->currently_building = BuildingType::BUILDING_NONE;
+            break;
+        case BuildingType::CITY:
+            // validate
+            corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos, *tile);
+            if (!this->can_place_city(corner)) {
+                break;
+            }
+            // place
+            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::CITY});
+            this->currently_building = BuildingType::BUILDING_NONE;
+            break;
+    }
+
+    return true;
 }
 
 bool client::HexMap::on_move(GameState& game_state) {
@@ -77,25 +113,34 @@ bool client::HexMap::on_move(GameState& game_state) {
     sf::Vector2i pixel_pos = sf::Mouse::getPosition(*this->game_window);
     sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, game_state.map_view);
 
-    HexTile* tile;
-    sf::Vector2f corner;
+    HexTile* tile = this->pixel_to_hex(world_pos);
+    if (tile == nullptr) {
+        this->marker.setPosition(sf::Vector2f{-100000.0f, -100000.0f});
+        return true;
+    }
+    sf::Vector2i corner;
+    sf::Vector2f corner_pixel;
     switch (this->currently_building) {
         case BuildingType::SETTLEMENT:
-            // get clicked tile
-            tile = this->pixel_to_hex(world_pos);
-            if (tile == nullptr) {
-                this->marker.setPosition(sf::Vector2f{-100000.0f, -100000.0f});
+            // validate
+            corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos, *tile);
+            if (!this->can_place_settlement(corner)) {
                 return true;
             }
-            // mark closest corner
-            corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos);
-            this->marker.setPosition(corner - sf::Vector2f{25.0f, 25.0f});
+            // set marker
+            corner_pixel = corner_to_pixel(BuildingData{corner.x, corner.y, BuildingType::BUILDING_NONE});
+            this->marker.setPosition(corner_pixel - sf::Vector2f{25.0f, 25.0f});
             return true;
         case BuildingType::CITY:
-            break;
-            // get corner, check if settlement is placed
-        default:
-            return false;
+            // validate
+            corner = this->get_closest_corner(this->hex_to_pixel(*tile), world_pos, *tile);
+            if (!this->can_place_city(corner)) {
+                return true;
+            }
+            // set marker
+            corner_pixel = corner_to_pixel(BuildingData{corner.x, corner.y, BuildingType::BUILDING_NONE});
+            this->marker.setPosition(corner_pixel - sf::Vector2f{25.0f, 25.0f});
+            return true;
     }
 
     return false;
@@ -166,9 +211,10 @@ sf::Vector3i client::HexMap::cube_round(sf::Vector3f cube) {
     return sf::Vector3i{(int)x, (int)y, (int)z};
 }
 
-sf::Vector2f client::HexMap::get_closest_corner(sf::Vector2f mid, sf::Vector2f pos) {
+sf::Vector2i client::HexMap::get_closest_corner(sf::Vector2f mid, sf::Vector2f pos, const HexTile& tile) {
     float min_dist = HEX_SIZE;
     sf::Vector2f result;
+    int x, y; // corner coordinate system
 
     for (float angle = 30.0f; angle < 360.0f; angle += 60.0f) {
         float radians = angle * M_PI / 180.0f;
@@ -177,8 +223,67 @@ sf::Vector2f client::HexMap::get_closest_corner(sf::Vector2f mid, sf::Vector2f p
         if (dist < min_dist) {
             min_dist = dist;
             result = mid + sf::Vector2f{std::cos(radians) * 100.0f, -std::sin(radians) * 100.0f};
+            // convert angle to corner coordinate system
+            if (angle == 30.0f) {
+                x = tile.x * 2 + 1;
+                y = tile.y;
+            } else if (angle == 90.0f) {
+                x = tile.x * 2;
+                y = tile.y;
+            } else if (angle == 150.0f) {
+                x = tile.x * 2 - 1;
+                y = tile.y;
+            } else if (angle == 210.0f) {
+                x = tile.y & 1 ? (tile.x - 1) * 2 : tile.x * 2;
+                y = tile.y + 1;
+            } else if (angle == 270.0f) {
+                x = tile.y & 1 ? tile.x * 2 - 1 : tile.x * 2 + 1;
+                y = tile.y + 1;
+            } else {
+                x = tile.y & 1 ? tile.x * 2 : (tile.x + 1) * 2;
+                y = tile.y + 1;
+            }
+        }
+    }
+    return sf::Vector2i{x, y};
+}
+
+sf::Vector2f client::HexMap::corner_to_pixel(BuildingData building) {
+    int tile_x = building.x < 0 && building.x & 1 ? building.x / 2 - 1 : building.x / 2;
+    int tile_y = building.y;
+    sf::Vector2f tile_pos = this->hex_to_pixel(HexTile{tile_x, tile_y, HexTileType::DESERT});
+
+    float angle = building.x & 1 ? 30.0f : 90.0f;
+    float radians = angle * M_PI / 180.0f;
+    return tile_pos + sf::Vector2f{std::cos(radians) * 100.0f, -std::sin(radians) * 100.0f};
+}
+
+bool client::HexMap::can_place_settlement(sf::Vector2i corner) {
+    sf::Vector2i checks[4];
+    checks[0] = sf::Vector2i{corner.x, corner.y};
+    checks[1] = sf::Vector2i{corner.x + 1, corner.y};
+    checks[2] = sf::Vector2i{corner.x - 1, corner.y};
+    int check4x = corner.y & 1 ? corner.x - 1 : corner.x + 1;
+    int check4y = corner.x & 1 ? corner.y + 1 : corner.y - 1;
+    checks[3] = sf::Vector2i{check4x, check4y};
+
+    for (const BuildingData& bd : this->buildings) {
+        for (const sf::Vector2i& check : checks) {
+            if (check.x == bd.x && check.y == bd.y) {
+                return false;
+            }
         }
     }
 
-    return result;
+    return true;
+}
+
+bool client::HexMap::can_place_city(sf::Vector2i corner) {
+    for (const BuildingData& bd : this->buildings) {
+        if (bd.type == BuildingType::SETTLEMENT && corner.x == bd.x && corner.y == bd.y) {
+            return true;
+        }
+    }
+
+    return false;
 }

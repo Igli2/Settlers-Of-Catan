@@ -32,7 +32,7 @@ namespace launcher {
 
         public:
             LauncherWindow();
-            void loop();
+            void render_loop();
             void launch_game();
     };
 }

@@ -22,7 +22,7 @@ launcher::LauncherWindow::LauncherWindow() :
         this->bg_sprite.setTexture(this->bg_texture);
 }
 
-void launcher::LauncherWindow::loop() {
+void launcher::LauncherWindow::render_loop() {
     while (this->isOpen()) {
         sf::Event event;
         while (this->pollEvent(event)) {

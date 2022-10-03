@@ -87,6 +87,7 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
                 break;
             }
             // place
+            game_state.get_socket().send(network::Packet{4, "SETTLEMENT " + std::to_string(corner.x) + " " + std::to_string(corner.y)});
             this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::SETTLEMENT});
             this->currently_building = BuildingType::BUILDING_NONE;
             break;
@@ -97,6 +98,7 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
                 break;
             }
             // place
+            game_state.get_socket().send(network::Packet{4, "CITY " + std::to_string(corner.x) + " " + std::to_string(corner.y)});
             this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::CITY});
             this->currently_building = BuildingType::BUILDING_NONE;
             break;

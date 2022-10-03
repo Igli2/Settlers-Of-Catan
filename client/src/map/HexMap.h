@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
+#include <string>
 
 #include "base/registry.h"
 #include "base/Clickable.h"

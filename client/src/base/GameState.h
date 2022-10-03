@@ -43,6 +43,7 @@ namespace client {
             Inventory& get_inventory();
             HexMap& get_hexmap();
             MouseHandler& get_mouse_handler();
+            network::Socket& get_socket();
 
             void resize(); // calls resizeable handlers
             void add_resizable_object(Resizable* r);

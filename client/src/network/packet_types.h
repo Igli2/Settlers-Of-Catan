@@ -5,6 +5,7 @@ namespace network {
         DISCONNECT,
         REGISTER_PLAYER,
         GET_TILEMAP,
-        TILE_DATA
+        TILE_DATA,
+        PLACE_BUILDING
     };
 }

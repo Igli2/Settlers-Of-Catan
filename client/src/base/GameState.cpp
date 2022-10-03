@@ -85,3 +85,7 @@ const client::LocalizationManager& client::GameState::get_localization_manager()
 client::MouseHandler& client::GameState::get_mouse_handler() {
     return this->mouse_handler;
 }
+
+network::Socket& client::GameState::get_socket() {
+    return this->socket;
+}

@@ -2,7 +2,6 @@ module PacketResponses (
     sendTileMapPackets
 ) where
 
-import System.IO
 import SOCMap (SOCMap)
 import GHC.IO.Handle (Handle)
 import PacketHandler (Packet (Packet), OutPacketChan, IPAddress)

@@ -20,8 +20,8 @@ import Network.Socket (SockAddr)
 import Control.Concurrent (Chan)
 
 data Packet = Packet {
-    packetType :: !Int8,
-    packetData :: !String
+    packetType :: Int8,
+    packetData :: String
 } deriving (Show)
 
 data IPAddress = BroadcastIP | IPAddress SockAddr deriving (Show)
@@ -34,8 +34,10 @@ type InPacketChan = PacketChan
 parsePacket :: Handle -> IO Packet
 parsePacket hdl = do
     packetIDBS <- BS8.hGet hdl 1
+
     packetLengthBS <- BS8.hGet hdl 8
     let packetLength = fromIntegral $ runGet getInt64be . BSL.fromStrict $ packetLengthBS
+    
     packetDataBS <- BS8.hGet hdl packetLength
 
     return $ runGet getPacket $ BSL.fromStrict (packetIDBS <> packetLengthBS <> packetDataBS)

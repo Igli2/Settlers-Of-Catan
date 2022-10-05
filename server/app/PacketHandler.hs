@@ -1,5 +1,9 @@
 module PacketHandler (
     Packet(..),
+    IPAddress(..),
+    PacketChan,
+    OutPacketChan,
+    InPacketChan,
     parsePacket,
     sendPacket,
 ) where
@@ -12,11 +16,20 @@ import Data.Int (Int8, Int64)
 import Data.Binary.Get (getInt64be, getInt8, runGet, getByteString, Get)
 import System.IO (Handle, hPutStr)
 import Data.Binary.Put (runPut, putInt8, putInt64be, putByteString, Put)
+import Network.Socket (SockAddr)
+import Control.Concurrent (Chan)
 
 data Packet = Packet {
     packetType :: !Int8,
     packetData :: !String
 } deriving (Show)
+
+data IPAddress = BroadcastIP | IPAddress SockAddr deriving (Show)
+
+type PacketChan = Chan (Packet, IPAddress)
+type OutPacketChan = PacketChan
+type InPacketChan = PacketChan
+
 
 parsePacket :: Handle -> IO Packet
 parsePacket hdl = do

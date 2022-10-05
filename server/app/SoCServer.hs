@@ -10,7 +10,7 @@ import Data.Binary.Put (runPut)
 import ConfigLoader
 import PacketHandler (Packet(packetType), parsePacket, sendPacket, IPAddress (IPAddress, BroadcastIP), InPacketChan, OutPacketChan, PacketChan)
 import SOCMap (createMapFromConfig, SOCMap)
-import PacketResponses (sendTileMapPackets)
+import PacketResponses (sendTileMapPackets, sendErrorPacket)
 import GHC.Base (IO(IO), when)
 
 main :: IO ()
@@ -33,7 +33,7 @@ main = do
 
         case packetType . fst $ toProcess of
             2 -> sendTileMapPackets socM broadcastChan (snd toProcess)
-            _ -> return () -- err packet
+            _ -> sendErrorPacket broadcastChan (snd toProcess) "Unknown packet type!"
 
         loop
 

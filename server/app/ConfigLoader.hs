@@ -35,7 +35,8 @@ instance FromJSON MapConfig
 data GameConfig = GameConfig {
     requiredVictoryPoints :: !Int,
     minCardsForRobbery :: !Int,
-    mapFile :: !FilePath
+    mapFile :: !FilePath,
+    serverPort :: !Integer
 } deriving (Show, Generic)
 
 instance FromJSON GameConfig

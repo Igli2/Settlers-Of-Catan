@@ -10,13 +10,9 @@ import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering)
 import Data.Binary.Put (runPut)
 
 import ConfigLoader
-
 import PacketHandler (Packet(packetType), parsePacket, sendPacket)
 import SOCMap (createMapFromConfig, SOCMap)
 import PacketResponses (sendTileMapPackets)
-
-serverPort :: PortNumber
-serverPort = 50140
 
 main :: IO ()
 main = do
@@ -29,7 +25,7 @@ main = do
     incomingChan <- newChan :: IO (Chan Packet)
 
     setSocketOption sock ReuseAddr 1
-    bind sock (SockAddrInet serverPort 0)
+    bind sock (SockAddrInet (fromInteger . serverPort  $ socCfg) 0)
     listen sock 4
 
     packetSender <- forkIO . fix $  \loop -> do

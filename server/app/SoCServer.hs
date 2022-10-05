@@ -41,17 +41,17 @@ main = do
         _ <- readChan  broadcastChan
         loop
 
-    serverLoop sock broadcastChan incomingChan
+    serverLoop (playerCount socCfg) sock broadcastChan incomingChan
 
     killThread packetSender
     killThread broadcastClearer
 
-serverLoop :: Socket -> OutPacketChan -> InPacketChan -> IO ()
-serverLoop sock recvChan sendChan = do
+serverLoop :: Int -> Socket -> OutPacketChan -> InPacketChan -> IO ()
+serverLoop sockCount sock recvChan sendChan = do
     connection <- accept sock
     forkIO (handleConnection connection recvChan sendChan)
 
-    serverLoop sock recvChan sendChan
+    serverLoop (sockCount - 1) sock recvChan sendChan
 
 handleConnection :: (Socket, SockAddr) -> OutPacketChan -> InPacketChan -> IO ()
 handleConnection (sock, addr) recvChan sendChan = do

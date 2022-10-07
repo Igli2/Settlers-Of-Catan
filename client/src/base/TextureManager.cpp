@@ -1,8 +1,10 @@
 #include "TextureManager.h"
 
+constexpr size_t MISSING_TEXTURE_SIZE = 16;
+
 client::TextureManager::TextureManager() {
     // create the missing texture and change the color
-    this->missing_texture.create(16, 16);
+    this->missing_texture.create(MISSING_TEXTURE_SIZE, MISSING_TEXTURE_SIZE);
     sf::Image missing_texture_image = this->missing_texture.copyToImage();
     for (int x = 0; x < missing_texture_image.getSize().x; x++) {
         for (int y = 0; y < missing_texture_image.getSize().x; y++) {
@@ -19,11 +21,11 @@ client::TextureManager::TextureManager() {
 }
 
 const sf::Texture& client::TextureManager::get_texture(const std::string& name) const {
-    if (this->has_texture(name)) {
-        return this->texture_map.at(name);
-    } else {
+    if (!this->has_texture(name)) {
         return this->missing_texture;
     }
+
+    return this->texture_map.at(name);
 }
 
 void client::TextureManager::load_texture(const std::string& name, const std::string& filename) {

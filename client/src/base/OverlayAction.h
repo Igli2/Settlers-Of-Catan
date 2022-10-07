@@ -22,6 +22,6 @@ namespace client {
             OverlayAction(GameState& game_state, Overlay* overlay_p, OverlayActionType type);
             bool on_click(GameState& game_state, sf::Mouse::Button button) override;
             sf::Text& get_text();
-            void set_action_name(std::string name);
+            void set_action_name(const std::string& name);
     };
 }

@@ -23,13 +23,13 @@ namespace client {
             bool is_active;
             GameState& game_state;
         public:
-            Overlay(GameState& game_state, std::string title);
+            Overlay(GameState& game_state, const std::string& title);
             void render(GameWindow& game_window);
             void set_active(bool state);
             void set_dimensions(sf::Rect<int> dimensions); // update inner widgets
             void on_accept();
             void on_decline();
-            void set_action_names(std::string accept, std::string decline);
+            void set_action_names(const std::string& accept, const std::string& decline);
 
             // block all mouse events for clickables not in overlay
             bool on_click(GameState& game_state, sf::Mouse::Button button) override { return true; }

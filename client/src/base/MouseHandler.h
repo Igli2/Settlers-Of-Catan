@@ -20,8 +20,8 @@ namespace client {
             void call_mouse_press(sf::Mouse::Button button, const sf::Vector2i& pos); // calls clickable handlers
             void call_mouse_release(sf::Mouse::Button button, const sf::Vector2i& pos); // calls clickable handlers
             void call_mouse_move(const sf::Vector2i& pos); // calls clickable handlers
-            void add_clickable_object(Clickable* c);
-            void add_clickable_object(Clickable* c, unsigned int priority); // priority defines at which index the clickable is inserted, useful for clickable overlays
-            void remove_clickable_object(Clickable* c);
+            void add_clickable_object(Clickable* to_add);
+            void add_clickable_object(Clickable* to_add, unsigned int priority); // priority defines at which index the clickable is inserted, useful for clickable overlays
+            void remove_clickable_object(Clickable* to_add);
     };
 }

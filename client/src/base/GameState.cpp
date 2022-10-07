@@ -1,32 +1,35 @@
 #include "GameState.h"
 
+constexpr size_t DEFAULT_WINDOW_WIDTH = 500;
+constexpr size_t DEFAULT_WINDOW_HEIGHT = 500;
+
 client::GameState::GameState(network::Socket& socket) :
-    window_size{500, 500},
+    window_size{DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT},
     mouse_handler{*this},
     inventory{*this},
     is_open{true},
     hex_map{*this},
     socket{socket} {
-        this->receive_thread = std::thread{GameState::receive_packets, this, &this->socket};
+        this->receive_thread = std::thread{&GameState::receive_packets, this};
 
         socket.send(network::Packet{2, "GET TILEMAP"});
 }
 
-void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {
+void client::GameState::receive_packets() {
     network::Packet packet;
-    while(game_state->is_open) {
-        packet = socket->receive_packet();
-        if (socket->get_status() == network::Socket::SocketStatus::ERROR) {
+    while(this->is_open) {
+        packet = this->socket.receive_packet();
+        if (this->socket.get_status() == network::Socket::SocketStatus::ERROR) {
             std::cout << "Error in packet, sync problems may occur" << std::endl;
             continue;
         }
         // handle packet
         switch (packet.packet_type) {
             case network::PacketType::DISCONNECT:
-                game_state->is_open = false;
+                this->is_open = false;
                 break;
             case network::PacketType::TILE_DATA:
-                game_state->get_hexmap().add_tile(packet.data);
+                this->get_hexmap().add_tile(packet.data);
                 break;
             default:
                 std::cout << (network::PacketType)packet.packet_type << ": " << packet.data << std::endl;
@@ -64,18 +67,20 @@ client::HexMap& client::GameState::get_hexmap() {
 
 // call the resize method for all resizable objects to resize UI elements
 void client::GameState::resize() {
+    const sf::Vector2f window_center = sf::Vector2f((float)this->window_size.x / 2.0f, (float)this->window_size.y / 2.0f);
+
     this->map_view.setSize(sf::Vector2f{this->window_size});
-    this->map_view.setCenter(this->window_size.x / 2.0f + this->hex_map.pos.x, this->window_size.y / 2.0f + this->hex_map.pos.y);
+    this->map_view.setCenter(window_center.x + this->hex_map.pos.x, window_center.y + this->hex_map.pos.y);
     this->map_view.zoom(this->hex_map.zoom);
     this->inventory_view.setSize(sf::Vector2f{this->window_size});
-    this->inventory_view.setCenter(this->window_size.x / 2.0f, this->window_size.y / 2.0f);
-    for (Resizable* r : this->resizables) {
-        r->on_resize(*this);
+    this->inventory_view.setCenter(window_center);
+    for (Resizable* to_resize : this->resizables) {
+        to_resize->on_resize(*this);
     }
 }
 
-void client::GameState::add_resizable_object(Resizable* r) {
-    this->resizables.push_back(r);
+void client::GameState::add_resizable_object(Resizable* to_add) {
+    this->resizables.push_back(to_add);
 }
 
 const client::LocalizationManager& client::GameState::get_localization_manager() {

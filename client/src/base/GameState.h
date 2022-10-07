@@ -4,11 +4,11 @@
 #include <algorithm>
 #include <thread>
 
-#include "TextureManager.h"
-#include "LocalizationManager.h"
-#include "Resizable.h"
 #include "Clickable.h"
+#include "LocalizationManager.h"
 #include "MouseHandler.h"
+#include "Resizable.h"
+#include "TextureManager.h"
 
 #include "inventory/Inventory.h"
 
@@ -46,8 +46,8 @@ namespace client {
             network::Socket& get_socket();
 
             void resize(); // calls resizeable handlers
-            void add_resizable_object(Resizable* r);
+            void add_resizable_object(Resizable* to_add);
 
-            static void receive_packets(GameState* game_state, network::Socket* socket);
+            void receive_packets();
     };
 }

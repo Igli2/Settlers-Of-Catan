@@ -10,16 +10,17 @@ client::MouseHandler::MouseHandler(GameState& game_state) :
 
 void client::MouseHandler::call_mouse_press(sf::Mouse::Button button, const sf::Vector2i& pos) {
     this->last_mouse_pressed = pos;
-    for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->on_press(this->game_state, button)) {
+    for (Clickable* to_check : this->clickables) {
+        if (to_check->contains(pos) && to_check->on_press(this->game_state, button)) {
             break;
         }
     }
 }
 
+//TODO: intended behaviour to allow click on multiple objects?
 void client::MouseHandler::call_mouse_release(sf::Mouse::Button button, const sf::Vector2i& pos) {
-    for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->on_release(this->game_state, button)) {
+    for (Clickable* to_check : this->clickables) {
+        if (to_check->contains(pos) && to_check->on_release(this->game_state, button)) {
             break;
         }
     }
@@ -29,10 +30,10 @@ void client::MouseHandler::call_mouse_release(sf::Mouse::Button button, const sf
             this->last_mouse_pressed = sf::Vector2i{-1, -1};
             return;
     }
-    for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && 
-            cp->contains(this->last_mouse_pressed) &&
-            cp->on_click(this->game_state, button)) {
+    for (Clickable* to_check : this->clickables) { // TODO: what exactly does this? merge with for loop ^?
+        if (to_check->contains(pos) && 
+            to_check->contains(this->last_mouse_pressed) &&
+            to_check->on_click(this->game_state, button)) {
                 break;
         }
     }
@@ -40,16 +41,16 @@ void client::MouseHandler::call_mouse_release(sf::Mouse::Button button, const sf
 }
 
 void client::MouseHandler::call_mouse_move(const sf::Vector2i& pos) {
-    for (Clickable* cp : this->clickables) {
-        if (!cp->contains(pos) && this->last_hovered == cp) {
+    for (Clickable* to_check : this->clickables) {
+        if (!to_check->contains(pos) && this->last_hovered == to_check) {
             last_hovered = nullptr;
-            cp->on_exit(this->game_state);
+            to_check->on_exit(this->game_state);
         }
     }
-    for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && this->last_hovered == nullptr || this->last_hovered != nullptr && !this->last_hovered->contains(pos) && cp->contains(pos)) {
-            last_hovered = cp;
-            cp->on_enter(this->game_state);
+    for (Clickable* to_check : this->clickables) {
+        if (to_check->contains(pos) && this->last_hovered == nullptr || this->last_hovered != nullptr && !this->last_hovered->contains(pos) && to_check->contains(pos)) {
+            last_hovered = to_check;
+            to_check->on_enter(this->game_state);
         }
     }
     this->call_on_move(pos);
@@ -59,31 +60,31 @@ void client::MouseHandler::call_on_move(const sf::Vector2i& pos) {
     if (game_state.get_hexmap().contains(pos) && game_state.get_hexmap().on_move(this->game_state)) {
         return;
     }
-    for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos)) {
-            cp->on_move(this->game_state);
+    for (Clickable* to_check : this->clickables) {
+        if (to_check->contains(pos)) {
+            to_check->on_move(this->game_state);
         }
     }
 }
 
-void client::MouseHandler::add_clickable_object(Clickable* c) {
-    this->clickables.push_back(c);
+void client::MouseHandler::add_clickable_object(Clickable* to_add) {
+    this->clickables.push_back(to_add);
 }
 
-void client::MouseHandler::add_clickable_object(Clickable* c, unsigned int priority) {
+void client::MouseHandler::add_clickable_object(Clickable* to_add, unsigned int priority) {
     if (this->clickables.size() > priority) {
-        this->clickables.insert(this->clickables.begin() + priority, c);
+        this->clickables.insert(this->clickables.begin() + priority, to_add);
     } else {
-        this->add_clickable_object(c);
+        this->add_clickable_object(to_add);
     }
 }
 
-void client::MouseHandler::remove_clickable_object(Clickable* c) {
-    if (this->last_hovered == c) {
+void client::MouseHandler::remove_clickable_object(Clickable* to_add) {
+    if (this->last_hovered == to_add) {
         this->last_hovered = nullptr;
     }
     for (std::vector<client::Clickable*>::iterator c_iter = this->clickables.begin(); c_iter != this->clickables.end(); c_iter++) {
-        if (c == *c_iter) {
+        if (to_add == *c_iter) {
             this->clickables.erase(c_iter);
             return;
         }

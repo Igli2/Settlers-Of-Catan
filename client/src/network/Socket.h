@@ -31,7 +31,7 @@ namespace network {
             explicit Socket(const SocketType type);
             Socket() = delete;
             Socket(const Socket& other) = delete;
-            Socket(Socket&& other);
+            Socket(Socket&& other) noexcept;
             ~Socket();
 
             Socket accept();
@@ -47,9 +47,9 @@ namespace network {
             SocketStatus get_status() const;
 
             Socket& operator=(const Socket& other) = delete;
-            Socket& operator=(Socket&& other);
+            Socket& operator=(Socket&& other) noexcept;
         private:
-            Socket(const int socket_id);
+            Socket(const int socket_id, const SocketType type);
 
             void create_new_socket();
 

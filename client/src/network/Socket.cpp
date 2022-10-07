@@ -18,8 +18,8 @@ std::string network::Packet::to_bytes() const {
     const uint64_t packet_length = htobe64((uint64_t)this->data.size());
     std::string binary_packet;
 
-    binary_packet.insert(0, (const char*)&this->packet_type, sizeof(uint8_t));
-    binary_packet.insert(sizeof(uint8_t), (const char*)&packet_length, sizeof(uint64_t));
+    binary_packet.insert(0, reinterpret_cast<const char*>(&this->packet_type), sizeof(uint8_t));
+    binary_packet.insert(sizeof(uint8_t), reinterpret_cast<const char*>(&packet_length), sizeof(uint64_t));
 
     binary_packet += this->data;
 
@@ -31,7 +31,7 @@ std::string network::Packet::to_bytes() const {
 network::Socket::Socket(const SocketType type) : socket_id{-1}, last_status(SocketStatus::SUCCESS), type(type) {
 }
 
-network::Socket::Socket(Socket&& other) : socket_id(-1), last_status(SocketStatus::SUCCESS) {
+network::Socket::Socket(Socket&& other) noexcept : socket_id(-1), last_status(SocketStatus::SUCCESS), type(SocketType::TCP) {
     *this = std::move(other);
 }
 
@@ -48,7 +48,7 @@ network::Socket network::Socket::accept() {
 
     this->last_status = SocketStatus::SUCCESS;
 
-    return std::move(Socket(connection_id));
+    return std::move(Socket(connection_id, this->type));
 }
 
 void network::Socket::bind(const uint16_t port) {
@@ -56,7 +56,7 @@ void network::Socket::bind(const uint16_t port) {
 
     const sockaddr_in target{AF_INET, htons(port), INADDR_ANY, 0};
 
-    if(::bind(this->socket_id, (const sockaddr*)&target, sizeof(sockaddr_in)) < 0) {
+    if(::bind(this->socket_id, reinterpret_cast<const sockaddr*>(&target), sizeof(sockaddr_in)) < 0) {
         this->last_status = SocketStatus::ERROR;
         return;
     }
@@ -72,7 +72,7 @@ void network::Socket::connect(const std::string& address, const uint16_t port) {
         throw std::runtime_error("Tried to connect to invalid address!");
     }
 
-    if(::connect(this->socket_id, (const sockaddr*)&target, sizeof(sockaddr_in)) < 0) {
+    if(::connect(this->socket_id, reinterpret_cast<const sockaddr*>(&target), sizeof(sockaddr_in)) < 0) {
         this->last_status = SocketStatus::ERROR;
         return;
     }
@@ -81,7 +81,9 @@ void network::Socket::connect(const std::string& address, const uint16_t port) {
 }
 
 void network::Socket::disconnect() {
-    if(this->socket_id < 0) return;
+    if(this->socket_id < 0) {
+        return;
+    }
     
     if(shutdown(this->socket_id, SHUT_RDWR) < 0) {
         this->last_status = SocketStatus::ERROR;
@@ -125,14 +127,20 @@ void network::Socket::send(const Packet& to_send) {
 network::Packet network::Socket::receive_packet() {
     Packet received;
 
-    received.packet_type = *(uint8_t*)this->receive(sizeof(uint8_t), false).c_str();
-    if(this->get_status() == SocketStatus::ERROR) return {};
+    received.packet_type = *reinterpret_cast<const uint8_t*>(this->receive(sizeof(uint8_t), false).c_str());
+    if(this->get_status() == SocketStatus::ERROR) {
+        return {};
+    }
 
-    uint64_t packet_length = be64toh(*(uint64_t*)this->receive(sizeof(uint64_t), false).c_str());
-    if(this->get_status() == SocketStatus::ERROR) return {};
+    uint64_t packet_length = be64toh(*reinterpret_cast<const uint64_t*>(this->receive(sizeof(uint64_t), false).c_str())); //TODO: change this to 16bit integer
+    if(this->get_status() == SocketStatus::ERROR) {
+        return {};
+    }
     
-    received.data = std::move(this->receive(packet_length, false));
-    if(this->get_status() == SocketStatus::ERROR) return {};
+    received.data = std::move(this->receive((short)packet_length, false));
+    if(this->get_status() == SocketStatus::ERROR) {
+        return {};
+    }
 
     return received;
 }
@@ -142,7 +150,7 @@ std::string network::Socket::receive(short max_bytes, const bool partial) {
     max_bytes = std::min(max_bytes, Socket::MAX_BUFFER_LENGTH);
     std::string msg(max_bytes, '\0');    
 
-    const ssize_t received_count = ::recv(this->socket_id, &msg[0], max_bytes, (partial) ? 0 : MSG_WAITALL);
+    const ssize_t received_count = ::recv(this->socket_id, msg.data(), max_bytes, (partial) ? 0 : MSG_WAITALL);
     
     if(received_count < 0) {
         this->last_status = SocketStatus::ERROR;
@@ -159,7 +167,7 @@ network::Socket::SocketStatus network::Socket::get_status() const {
     return this->last_status;
 }
 
-network::Socket& network::Socket::operator=(Socket&& other) {
+network::Socket& network::Socket::operator=(Socket&& other) noexcept {
     this->disconnect();
 
     this->socket_id = other.socket_id;
@@ -172,7 +180,7 @@ network::Socket& network::Socket::operator=(Socket&& other) {
 
 //private
 
-network::Socket::Socket(const int socket_id) : socket_id(socket_id) {
+network::Socket::Socket(const int socket_id, const SocketType type) : socket_id(socket_id), type(type), last_status(SocketStatus::SUCCESS) {
 }
 
 void network::Socket::create_new_socket() {

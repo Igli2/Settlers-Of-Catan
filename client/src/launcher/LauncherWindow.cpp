@@ -6,7 +6,10 @@ launcher::LauncherWindow::LauncherWindow() :
         "Settlers Of Catan - Launcher",
         sf::Style::Titlebar | sf::Style::Close
     },
-    play_button{229, 253, 342, 33} {
+    play_button{229, 253, 342, 33},
+    credits_button{229, 290, 342, 33},
+    back_button{229, 216, 342, 33},
+    view{LauncherView::LAUNCHER} {
         this->setFramerateLimit(30);
 
         if (!this->font.loadFromFile(RESOURCE_FOLDER"/fonts/OpenSans.ttf")) {
@@ -18,6 +21,9 @@ launcher::LauncherWindow::LauncherWindow() :
 
         if (!this->bg_texture.loadFromFile(RESOURCE_FOLDER"/textures/launcher_background.png")) {
             std::cout << "Cannot load texture for launcher" << std::endl;
+        }
+        if (!this->bg_texture_credits.loadFromFile(RESOURCE_FOLDER"/textures/launcher_credits.png")) {
+            std::cout << "Cannot load texture for credits" << std::endl;
         }
         this->bg_sprite.setTexture(this->bg_texture);
 }
@@ -36,8 +42,19 @@ void launcher::LauncherWindow::render_loop() {
             } else if (event.type == sf::Event::MouseButtonReleased) {
                 // check button clicks
                 sf::Vector2i mouse_pos{event.mouseButton.x, event.mouseButton.y};
-                if (this->play_button.contains(this->last_mouse_click) && this->play_button.contains(mouse_pos)) {
-                    this->launch_game();
+                if (this->view == LauncherView::CREDITS) {
+                    if (this->back_button.contains(this->last_mouse_click) && this->back_button.contains(mouse_pos)) {
+                        this->bg_sprite.setTexture(this->bg_texture);
+                        this->view = LauncherView::LAUNCHER;
+                    }
+                } else {
+                    if (this->play_button.contains(this->last_mouse_click) && this->play_button.contains(mouse_pos)) {
+                        this->launch_game();
+                    } else if (this->credits_button.contains(this->last_mouse_click) && this->credits_button.contains(mouse_pos)) {
+                        // view credits
+                        this->bg_sprite.setTexture(this->bg_texture_credits);
+                        this->view = LauncherView::CREDITS;
+                    }
                 }
                 this->last_mouse_click = sf::Vector2i{-1, -1};
             } else if (event.type == sf::Event::KeyPressed) {
@@ -50,7 +67,9 @@ void launcher::LauncherWindow::render_loop() {
         this->clear(sf::Color{120, 120, 220});
 
         this->draw(this->bg_sprite);
-        this->draw(this->input_text);
+        if (this->view == LauncherView::LAUNCHER) {
+            this->draw(this->input_text);
+        }
 
         this->display();
     }
@@ -84,6 +103,9 @@ void launcher::LauncherWindow::launch_game() {
 
 void launcher::LauncherWindow::on_key_press(sf::Event::KeyEvent event) {
     if (this->input_str.length() >= 21 && event.code != sf::Keyboard::BackSpace) {
+        return;
+    }
+    if (this->view == LauncherView::CREDITS) {
         return;
     }
 

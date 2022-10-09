@@ -19,7 +19,7 @@ void client::MouseHandler::call_mouse_press(sf::Mouse::Button button, const sf::
 
 void client::MouseHandler::call_mouse_release(sf::Mouse::Button button, const sf::Vector2i& pos) {
     for (Clickable* cp : this->clickables) {
-        if (cp->contains(pos) && cp->on_release(this->game_state, button)) {
+        if (cp->on_release(this->game_state, button)) {
             break;
         }
     }

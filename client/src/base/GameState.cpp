@@ -9,7 +9,7 @@ client::GameState::GameState(network::Socket& socket) :
     socket{socket} {
         this->receive_thread = std::thread{GameState::receive_packets, this, &this->socket};
 
-        socket.send(network::Packet{2, "GET TILEMAP"});
+        socket.send(network::Packet{network::PacketType::GET_TILEMAP, "GET TILEMAP"});
 }
 
 void client::GameState::receive_packets(GameState* game_state, network::Socket* socket) {
@@ -36,7 +36,7 @@ void client::GameState::receive_packets(GameState* game_state, network::Socket* 
 }
 
 client::GameState::~GameState() {
-    this->socket.send(network::Packet{0, "CLOSE CONNECTION; BYE BYE :3"});
+    this->socket.send(network::Packet{network::PacketType::DISCONNECT, "CLOSE CONNECTION"});
     this->is_open = false;
     this->socket.disconnect();
     this->receive_thread.join();

@@ -21,6 +21,8 @@ namespace client {
         public:
             OverlayAction(GameState& game_state, Overlay* overlay_p, OverlayActionType type);
             bool on_click(GameState& game_state, sf::Mouse::Button button) override;
+            bool on_press(GameState& game_state, sf::Mouse::Button button) override;
+            bool on_release(GameState& game_state, sf::Mouse::Button button) override;
             sf::Text& get_text();
             void set_action_name(std::string name);
     };

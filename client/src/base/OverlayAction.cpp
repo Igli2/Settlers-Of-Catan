@@ -35,3 +35,14 @@ sf::Text& client::OverlayAction::get_text() {
 void client::OverlayAction::set_action_name(std::string name) {
     this->text.setString(name);
 }
+
+
+bool client::OverlayAction::on_press(GameState& game_state, sf::Mouse::Button button) {
+    this->text.setFillColor(sf::Color::White);
+    return false;
+}
+
+bool client::OverlayAction::on_release(GameState& game_state, sf::Mouse::Button button) {
+    this->text.setFillColor(sf::Color::Black);
+    return false;
+}

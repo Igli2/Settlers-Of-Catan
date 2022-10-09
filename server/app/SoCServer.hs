@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
 import Network.Socket
@@ -10,13 +8,10 @@ import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering)
 import Data.Binary.Put (runPut)
 
 import ConfigLoader
-
-import PacketHandler (Packet(packetType), parsePacket, sendPacket)
+import PacketHandler (Packet(packetType), parsePacket, sendPacket, IPAddress (IPAddress, BroadcastIP), InPacketChan, OutPacketChan, PacketChan)
 import SOCMap (createMapFromConfig, SOCMap)
-import PacketResponses (sendTileMapPackets)
-
-serverPort :: PortNumber
-serverPort = 50140
+import PacketResponses (sendTileMapPackets, sendErrorPacket)
+import GHC.Base (IO(IO), when)
 
 main :: IO ()
 main = do
@@ -25,57 +20,64 @@ main = do
     let socM = createMapFromConfig mapCfg
 
     sock <- socket AF_INET Stream 0
-    broadcastChan <- newChan :: IO (Chan Packet)
-    incomingChan <- newChan :: IO (Chan Packet)
+    broadcastChan <- newChan :: IO PacketChan
+    incomingChan <- newChan :: IO PacketChan
 
     setSocketOption sock ReuseAddr 1
-    bind sock (SockAddrInet serverPort 0)
+    bind sock (SockAddrInet (fromInteger . serverPort  $ socCfg) 0)
     listen sock 4
 
     packetSender <- forkIO . fix $  \loop -> do
-        toSend <- readChan incomingChan
-        writeChan broadcastChan toSend
-        putStrLn $ "Received packet: " ++ show toSend
+        toProcess <- readChan incomingChan
+        putStrLn $ "Received packet: " ++ show toProcess
+
+        case packetType . fst $ toProcess of
+            2 -> sendTileMapPackets socM broadcastChan (snd toProcess)
+            _ -> sendErrorPacket broadcastChan (snd toProcess) "Unknown packet type!"
+
         loop
 
     broadcastClearer <- forkIO . fix $ \loop -> do
         _ <- readChan  broadcastChan
         loop
 
-    serverLoop sock broadcastChan incomingChan socM
+    serverLoop (playerCount socCfg) sock broadcastChan incomingChan
 
     killThread packetSender
     killThread broadcastClearer
 
-serverLoop :: Socket -> Chan Packet -> Chan Packet -> SOCMap -> IO ()
-serverLoop sock broadcastChan incomingChan socM = do
+serverLoop :: Int -> Socket -> OutPacketChan -> InPacketChan -> IO ()
+serverLoop sockCount sock recvChan sendChan = do
     connection <- accept sock
-    forkIO (handleConnection connection broadcastChan incomingChan socM)
+    forkIO (handleConnection connection recvChan sendChan)
 
-    serverLoop sock broadcastChan incomingChan socM
+    serverLoop (sockCount - 1) sock recvChan sendChan
 
-handleConnection :: (Socket, SockAddr) -> Chan Packet -> Chan Packet -> SOCMap -> IO ()
-handleConnection (sock, addr) broadcastChan incomingChan socM = do
+handleConnection :: (Socket, SockAddr) -> OutPacketChan -> InPacketChan -> IO ()
+handleConnection (sock, addr) recvChan sendChan = do
     hdl <- socketToHandle sock ReadWriteMode
     hSetBuffering hdl NoBuffering
 
     putStrLn $ "Client connected: " ++ show addr
 
-    listenerChan <- dupChan broadcastChan
+    listenerChan <- dupChan recvChan
     listener <- forkIO . fix $ \loop -> do
         toSend <- readChan listenerChan
-        sendPacket toSend hdl
+
+        case snd toSend of
+            BroadcastIP        -> sendPacket (fst toSend) hdl
+            IPAddress recvAddr -> when (recvAddr == addr) $ sendPacket (fst toSend) hdl
+
         loop
 
     handle (\(SomeException _) -> return ()) . fix $ \loop -> do
         packet <- parsePacket hdl 
         case packetType packet of
             0  -> return ()
-            2 -> sendTileMapPackets socM hdl >> loop
-            _   -> broadcast packet >> loop
+            _   -> sendQuery packet >> loop
 
     killThread listener
 
     putStrLn $ "Client with ip " ++ show addr ++ " disconnected"
 
-    where broadcast msg = writeChan incomingChan msg
+    where sendQuery msg = writeChan sendChan (msg, IPAddress addr)

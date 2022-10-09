@@ -1,3 +1,5 @@
 requiredVictoryPoints: 10
 minCardsForRobbery: 8
 mapFile: "map.yml"
+serverPort: 50140
+playerCount: 1

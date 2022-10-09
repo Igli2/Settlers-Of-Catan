@@ -12,3 +12,7 @@ overlay_accept: Accept
 overlay_decline: Decline
 trade_overlay_request: Request
 trade_overlay_cancel: Cancel
+cant_connect: Can't Connect
+play: Start Game
+credits: Credits
+back: Back

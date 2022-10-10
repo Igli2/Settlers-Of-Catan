@@ -26,19 +26,19 @@ const std::array<std::string, client::DevelopmentCardType::DEVELOPMENT_CARD_MAX>
     "great_hall_description"
 };
 
-client::DevelopmentCard::DevelopmentCard(GameState& game_state, DevelopmentCardType type) : Clickable{game_state, sf::Rect<int>{}}, type{type} {
+client::DevelopmentCard::DevelopmentCard(GameState& game_state, DevelopmentCardType type) : Clickable{game_state, sf::Rect<int>{}}, type{type}, game_state{game_state} {
     this->setTexture(game_state.get_texture_manager().get_texture(card_texture_names[type]));
 }
 
-bool client::DevelopmentCard::on_click(GameState& game_state, sf::Mouse::Button button) {
+bool client::DevelopmentCard::on_click(sf::Mouse::Button button) {
     // delete all pointers to this and commit suicide
-    game_state.get_mouse_handler().remove_clickable_object(this);
-    game_state.get_inventory().remove_development_card(game_state, this);
+    this->game_state.get_mouse_handler().remove_clickable_object(this);
+    this->game_state.get_inventory().remove_development_card(this->game_state, this);
     delete this;
     return true;
 }
 
-bool client::DevelopmentCard::on_enter(GameState& game_state) {
-    std::cout << game_state.get_localization_manager().get_translation(card_descriptions[this->type]) << std::endl;
+bool client::DevelopmentCard::on_enter() {
+    std::cout << this->game_state.get_localization_manager().get_translation(card_descriptions[this->type]) << std::endl;
     return true;
 }

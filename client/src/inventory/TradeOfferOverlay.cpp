@@ -3,13 +3,14 @@
 #include "base/GameState.h"
 #include "base/GameWindow.h"
 
-client::TradeOfferResource::TradeOfferResource() : Clickable{sf::Rect<int>{}} {}
+client::TradeOfferResource::TradeOfferResource(GameState& game_state) : Clickable{sf::Rect<int>{}}, game_state{game_state} {}
 
 client::TradeOfferResource::TradeOfferResource(GameState& game_state, ResourceType type, TradeOfferOverlay* overlay) :
     Clickable{sf::Rect<int>{}},
     res_count{0},
     overlay{overlay},
-    type{type} {
+    type{type},
+    game_state{game_state} {
         this->res_texture.setTexture(game_state.get_texture_manager().get_texture(resource_texture_names[type]));
 
         float scale = 50.0f / this->res_texture.getTexture()->getSize().x;
@@ -21,9 +22,9 @@ client::TradeOfferResource::TradeOfferResource(GameState& game_state, ResourceTy
         this->count_text.setCharacterSize(22);
 }
 
-bool client::TradeOfferResource::on_click(GameState& game_state, sf::Mouse::Button button) {
+bool client::TradeOfferResource::on_click(sf::Mouse::Button button) {
     if (button == sf::Mouse::Button::Left) {
-        if (game_state.get_inventory().get_resource(this->type) > this->res_count) {
+        if (this->game_state.get_inventory().get_resource(this->type) > this->res_count) {
             this->res_count++;
             this->count_text.setString(std::to_string(this->res_count));
         }
@@ -76,8 +77,8 @@ client::TradeOfferOverlay::TradeOfferOverlay(GameState& game_state) :
         this->selection_border_request.setFillColor(sf::Color::Transparent);
 
         for (int i = 0; i < ResourceType::RESOURCE_MAX; i++) {
-            this->request_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this};
-            this->offer_buttons[i] = TradeOfferResource{game_state, (ResourceType)i, this};
+            this->request_buttons.push_back(TradeOfferResource{game_state, (ResourceType)i, this});
+            this->offer_buttons.push_back(TradeOfferResource{game_state, (ResourceType)i, this});
         }
 }
 

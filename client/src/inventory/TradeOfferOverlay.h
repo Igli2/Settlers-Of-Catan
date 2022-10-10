@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <array>
 #include <string>
+#include <vector>
 
 #include "Resource.h"
 
@@ -22,10 +23,11 @@ namespace client {
             sf::Text count_text;
             TradeOfferOverlay* overlay;
             ResourceType type;
+            GameState& game_state;
         public:
-            TradeOfferResource();
+            TradeOfferResource(GameState& game_state);
             TradeOfferResource(GameState& game_state, ResourceType type, TradeOfferOverlay* overlay);
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
+            bool on_click(sf::Mouse::Button button) override;
             void set_position(float x, float y);
             void render(GameWindow& game_window, GameState& game_state);
             bool is_selected();
@@ -36,8 +38,8 @@ namespace client {
         private:
             sf::RectangleShape selection_border_offer;
             sf::RectangleShape selection_border_request;
-            std::array<TradeOfferResource, ResourceType::RESOURCE_MAX> request_buttons;
-            std::array<TradeOfferResource, ResourceType::RESOURCE_MAX> offer_buttons;
+            std::vector<TradeOfferResource> request_buttons;
+            std::vector<TradeOfferResource> offer_buttons;
         public:
             TradeOfferOverlay(GameState& game_state);
             void render(GameWindow& game_window);

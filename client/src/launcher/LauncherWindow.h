@@ -9,6 +9,7 @@
 #include "base/GameState.h"
 #include "base/GameWindow.h"
 #include "base/LocalizationManager.h"
+#include "base/ClickableText.h"
 
 namespace launcher {
     enum LauncherView {
@@ -31,19 +32,18 @@ namespace launcher {
             sf::Text input_text;
             sf::Font font;
             std::string input_str;
-            // play button
-            sf::Rect<int> play_button;
-            sf::Text play_button_text;
-            sf::Rect<int> credits_button;
-            sf::Text credits_button_text;
-            sf::Rect<int> back_button;
-            sf::Text back_button_text;
+            // buttons
+            client::ClickableText play;
+            client::ClickableText credits;
+            client::ClickableText back;
             sf::Vector2i last_mouse_click;
             LauncherView view;
             // settings
             
             void on_key_press(sf::Event::KeyEvent event);
-            void create_text(sf::Text& sf_text, std::string text_localization, float x, float y);
+            void create_text(client::ClickableText& text, std::string text_localization, float x, float y);
+            void handle_mouse_press(const sf::Event& event);
+            void handle_mouse_release(const sf::Event& event);
 
         public:
             LauncherWindow();

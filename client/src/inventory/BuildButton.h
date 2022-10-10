@@ -11,10 +11,11 @@ namespace client {
     class BuildButton : public sf::Sprite, public Clickable {
         private:
             BuildingType type;
+            GameState& game_state;
         public:
-            BuildButton();
-            void init(GameState& game_state, BuildingType type);
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
+            BuildButton(GameState& game_state);
+            void init(BuildingType type);
+            bool on_click(sf::Mouse::Button button) override;
             // TODO: display tooltip on hover
     };
 }

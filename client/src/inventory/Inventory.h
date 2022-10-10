@@ -25,7 +25,7 @@ namespace client {
         private:
             std::array<sf::RectangleShape, 5> background;
             std::array<Resource, ResourceType::RESOURCE_MAX> resources;
-            std::array<BuildButton, BuildingType::BUILDING_MAX - 1> buildings;
+            std::vector<BuildButton*> buildings;
             std::vector<DevelopmentCard*> development_cards; // delete manually when removed
             VictoryPoint victory_point;
             Trade trade;

@@ -26,7 +26,7 @@ void client::Trade::on_resize(GameState& game_state) {
     });
 }
 
-bool client::Trade::on_click(GameState& game_state, sf::Mouse::Button button) {
+bool client::Trade::on_click(sf::Mouse::Button button) {
     if (button == sf::Mouse::Button::Left) {
         this->overlay.set_active(true);
         return true;

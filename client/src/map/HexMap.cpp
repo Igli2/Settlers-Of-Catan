@@ -55,16 +55,16 @@ void client::HexMap::on_resize(GameState& game_state) {
     });
 }
 
-bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
+bool client::HexMap::on_click(sf::Mouse::Button button) {
     if (this->currently_building == BuildingType::BUILDING_NONE) {
         return false;
     }
 
     sf::Vector2i pixel_pos = sf::Mouse::getPosition(*this->game_window);
-    sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, game_state.map_view);
+    sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, this->game_state.map_view);
 
     // while building, only clicks in upper part are allowed
-    if (pixel_pos.y > game_state.get_window_size().y / 3.0 * 2.0) {
+    if (pixel_pos.y > this->game_state.get_window_size().y / 3.0 * 2.0) {
         return true;
     }
     if (button == sf::Mouse::Button::Right || button == sf::Mouse::Button::Middle) {
@@ -72,7 +72,6 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
         return true;
     }
     
-    // TODO: send place packet
     HexTile* tile = this->pixel_to_hex(world_pos);
     if (tile == nullptr) {
         this->marker.setPosition(sf::Vector2f{-100000.0f, -100000.0f});
@@ -87,7 +86,10 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
                 break;
             }
             // place
-            game_state.get_socket().send(network::Packet{network::PacketType::PLACE_BUILDING, "SETTLEMENT " + std::to_string(corner.x) + " " + std::to_string(corner.y)});
+            this->game_state.get_socket().send(network::Packet{
+                network::PacketType::PLACE_BUILDING,
+                "SETTLEMENT " + std::to_string(corner.x) + " " + std::to_string(corner.y)
+            });
             this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::SETTLEMENT});
             this->currently_building = BuildingType::BUILDING_NONE;
             break;
@@ -98,7 +100,10 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
                 break;
             }
             // place
-            game_state.get_socket().send(network::Packet{network::PacketType::PLACE_BUILDING, "CITY " + std::to_string(corner.x) + " " + std::to_string(corner.y)});
+            this->game_state.get_socket().send(network::Packet{
+                network::PacketType::PLACE_BUILDING,
+                "CITY " + std::to_string(corner.x) + " " + std::to_string(corner.y)
+            });
             this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::CITY});
             this->currently_building = BuildingType::BUILDING_NONE;
             break;
@@ -107,13 +112,13 @@ bool client::HexMap::on_click(GameState& game_state, sf::Mouse::Button button) {
     return true;
 }
 
-bool client::HexMap::on_move(GameState& game_state) {
+bool client::HexMap::on_move() {
     if (this->currently_building == BuildingType::BUILDING_NONE) {
         return false;
     }
 
     sf::Vector2i pixel_pos = sf::Mouse::getPosition(*this->game_window);
-    sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, game_state.map_view);
+    sf::Vector2f world_pos = this->game_window->mapPixelToCoords(pixel_pos, this->game_state.map_view);
 
     HexTile* tile = this->pixel_to_hex(world_pos);
     if (tile == nullptr) {

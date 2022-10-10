@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Clickable.h"
+#include "ClickableText.h"
 
 namespace client {
     class Overlay;
@@ -13,17 +13,13 @@ namespace client {
         DECLINE
     };
 
-    class OverlayAction : public Clickable {
+    class OverlayAction : public ClickableText {
         private:
             Overlay* overlay_p;
             OverlayActionType type;
-            sf::Text text;
         public:
             OverlayAction(GameState& game_state, Overlay* overlay_p, OverlayActionType type);
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
-            bool on_press(GameState& game_state, sf::Mouse::Button button) override;
-            bool on_release(GameState& game_state, sf::Mouse::Button button) override;
-            sf::Text& get_text();
+            bool on_click(sf::Mouse::Button button) override;
             void set_action_name(std::string name);
     };
 }

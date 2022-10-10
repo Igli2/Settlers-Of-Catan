@@ -32,10 +32,10 @@ namespace client {
             void set_action_names(std::string accept, std::string decline);
 
             // block all mouse events for clickables not in overlay
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override { return true; }
-            bool on_press(GameState& game_state, sf::Mouse::Button button) { return true; }
-            bool on_release(GameState& game_state, sf::Mouse::Button button) { return true; }
-            bool on_enter(GameState& game_state) { return true; }
-            bool on_exit(GameState& game_state) { return true; }
+            bool on_click(sf::Mouse::Button button) override { return true; }
+            bool on_press(sf::Mouse::Button button) override { return true; }
+            bool on_release(sf::Mouse::Button button) override { return true; }
+            bool on_enter() override { return true; }
+            bool on_exit() override { return true; }
     };
 }

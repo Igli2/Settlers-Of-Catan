@@ -28,8 +28,8 @@ void client::Overlay::render(GameWindow& game_window) {
             game_window.draw(rs);
         }
         game_window.draw(this->title);
-        game_window.draw(this->accept.get_text());
-        game_window.draw(this->decline.get_text());
+        game_window.draw(this->accept.get_render_text());
+        game_window.draw(this->decline.get_render_text());
     }
 }
 
@@ -70,15 +70,15 @@ void client::Overlay::set_dimensions(sf::Rect<int> dimensions) {
     this->title.setPosition(title_x, dimensions.top + 20.0f);
 
     float button_y = dimensions.top + dimensions.height - 55.0f;
-    float decline_width = this->decline.get_text().getLocalBounds().width;
-    float accept_width = this->accept.get_text().getLocalBounds().width;
+    float decline_width = this->decline.get_render_text().getLocalBounds().width;
+    float accept_width = this->accept.get_render_text().getLocalBounds().width;
     float decline_x = dimensions.left + dimensions.width - decline_width - 30.0f;
     float accept_x = decline_x - accept_width - 30.0f;
 
-    this->accept.get_text().setPosition(accept_x, button_y);
-    this->decline.get_text().setPosition(decline_x, button_y);
-    this->accept.set_area(sf::Rect<int>{this->accept.get_text().getGlobalBounds()});
-    this->decline.set_area(sf::Rect<int>{this->decline.get_text().getGlobalBounds()});
+    this->accept.set_bounds(sf::Rect<int>{(int)accept_x, (int)button_y, (int)accept_width, 50});
+    this->decline.set_bounds(sf::Rect<int>{(int)decline_x, (int)button_y, (int)decline_width, 50});
+    this->accept.set_area(sf::Rect<int>{this->accept.get_render_text().getGlobalBounds()});
+    this->decline.set_area(sf::Rect<int>{this->decline.get_render_text().getGlobalBounds()});
 
     for (int x = 0; x < this->background.size(); x++) {
         this->background[x].setSize(sf::Vector2f{

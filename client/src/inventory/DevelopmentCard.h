@@ -24,9 +24,10 @@ namespace client {
     class DevelopmentCard : public sf::Sprite, public Clickable {
         private:
             DevelopmentCardType type;
+            GameState& game_state;
         public:
             DevelopmentCard(GameState& game_state, DevelopmentCardType type);
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
-            bool on_enter(GameState& game_state) override;
+            bool on_click(sf::Mouse::Button button) override;
+            bool on_enter() override;
     };
 }

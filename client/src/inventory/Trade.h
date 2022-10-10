@@ -17,7 +17,7 @@ namespace client {
         public:
             Trade(GameState& game_state);
             void on_resize(GameState& game_state) override;
-            bool on_click(GameState& game_state, sf::Mouse::Button button) override;
+            bool on_click(sf::Mouse::Button button) override;
             void render(GameWindow& game_window, GameState& game_state);
     };
 }

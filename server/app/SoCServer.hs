@@ -9,7 +9,7 @@ import Data.Binary.Put (runPut)
 
 import ConfigLoader
 import PacketHandler (Packet(packetType), parsePacket, sendPacket, IPAddress (IPAddress, BroadcastIP), InPacketChan, OutPacketChan, PacketChan)
-import SOCMap (createMapFromConfig, SOCMap)
+import GameData(TileMap)
 import PacketResponses (sendTileMapPackets, sendErrorPacket)
 import GHC.Base (IO(IO), when)
 

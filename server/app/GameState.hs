@@ -3,16 +3,18 @@ module GameState (
     GameState(..),
     applyModifier,
     modifyPlayer,
-    modifyMap,
+    modifyTiles,
+    modifyCorners,
     changeCardAmount,
     changeVictoryPoints,
-    cardAmount
+    cardAmount,
+    placeSettlement
 ) where
 
-import GameData (PlayerName, Player(..), TileMap, CardType (ResourceCard), Position, PlaceableType (CornerPlaceable))
+import GameData (PlayerName, Player(..), TileMap, CardType (ResourceCard), Position, PlaceableType (CornerPlaceable), CornerMap, getCornerNeighbours)
 import qualified Data.Map as Map
 import Control.Monad ((<=<))
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isNothing, fromJust)
 
 newtype Modifier a = M (a -> Either String a)
 
@@ -26,7 +28,8 @@ instance Monoid (Modifier a) where
 
 data GameState = GameState {
     players :: Map.Map PlayerName Player,
-    tileMap :: TileMap
+    tileMap :: TileMap,
+    cornerMap :: CornerMap
 } deriving (Show)
 
 applyModifier :: Modifier a -> a -> Either String a
@@ -35,12 +38,15 @@ applyModifier (M f) = f
 modifyPlayer :: PlayerName -> Modifier Player -> Modifier GameState
 modifyPlayer pName pMod = M (\g ->
         case Map.lookup pName . players $ g of
-            Nothing -> Left $ "No player with the name '" ++ pName ++ " found!"
+            Nothing -> Left $ "No player with the name '" ++ pName ++ "' found!"
             Just p -> applyModifier pMod p >>= (\p' -> Right g {players = Map.insert pName p' (players g)})
     )
 
-modifyMap :: Modifier TileMap -> Modifier GameState
-modifyMap mMod = M (\g -> applyModifier mMod (tileMap g) >>= (\m' -> Right g {tileMap = m'}))
+modifyTiles :: Modifier TileMap -> Modifier GameState
+modifyTiles mMod = M (\g -> applyModifier mMod (tileMap g) >>= (\m' -> Right g {tileMap = m'}))
+
+modifyCorners :: Modifier CornerMap -> Modifier GameState
+modifyCorners cMod = M (\g -> applyModifier cMod (cornerMap g) >>= (\c' -> Right g {cornerMap = c'}))
 
 changeCardAmount :: CardType -> Integer -> Modifier Player
 changeCardAmount cT delta = M (\p -> let currAmount = cardAmount cT p in 
@@ -59,9 +65,16 @@ changeVictoryPoints delta = M (\p -> let v' = victoryPoints p + delta in
 cardAmount :: CardType -> Player -> Integer
 cardAmount cT = fromMaybe 0 . Map.lookup cT . playerCards
 
--- placeSettlement :: PlayerName -> Position -> Modifier GameState
--- placeSettlement pName pos = mconcat [modifyPlayer pName settlementCosts, placePlaceable (CornerPlaceable "settlement") pName pos]
---     where settlementCosts = mconcat . map (\t -> changeCardAmount (ResourceCard t) (-1)) $ ["wool", "brick", "corn", "lumber"]
+placeSettlement :: PlayerName -> Position -> Modifier GameState
+placeSettlement pName pos = mconcat [modifyPlayer pName settlementCosts, placeCornerPlaceable (CornerPlaceable "settlement") pName pos]
+    where settlementCosts = mconcat . map (\t -> changeCardAmount (ResourceCard t) (-1)) $ ["wool", "brick", "corn", "lumber"]
 
--- placePlaceable :: PlaceableType -> PlayerName -> Position -> Modifier GameState
--- placePlaceable = undefined --validation?
+-- TODO: not every corner placeable needs distance of 2 from next; dont store corner as bool
+placeCornerPlaceable :: PlaceableType -> PlayerName -> Position -> Modifier GameState
+placeCornerPlaceable (CornerPlaceable pT) pName pos = M (\g ->
+        if isPosValid (cornerMap g)
+        then Right g {cornerMap = Map.insert pos True (cornerMap g)}
+        else Left "It is not allowed to place sth. at this corner!"
+    )
+    where isPosValid cMap = not . any (fromMaybe False . flip Map.lookup cMap) $ getCornerNeighbours pos 
+placeCornerPlaceable _ _ _ = undefined

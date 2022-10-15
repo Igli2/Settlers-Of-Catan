@@ -29,9 +29,12 @@ namespace launcher {
             sf::Texture bg_texture_credits;
             sf::Sprite bg_sprite;
             // ip input border + text
-            sf::Text input_text;
+            sf::Text ip_text;
+            sf::Text name_text;
             sf::Font font;
-            std::string input_str;
+            std::string ip_str;
+            std::string name_str;
+            std::string* focused_string;
             // buttons
             client::ClickableText play;
             client::ClickableText credits;
@@ -39,15 +42,20 @@ namespace launcher {
             sf::Vector2i last_mouse_click;
             LauncherView view;
             // settings
+            // TODO
+            // server connection
+            network::Socket server_connection;
             
             void on_key_press(sf::Event::KeyEvent event);
             void create_text(client::ClickableText& text, std::string text_localization, float x, float y);
             void handle_mouse_press(const sf::Event& event);
             void handle_mouse_release(const sf::Event& event);
+            char key_to_char(sf::Keyboard::Key key, bool shift);
+            void launch_game();
+            void connect();
 
         public:
             LauncherWindow();
             void render_loop();
-            void launch_game();
     };
 }

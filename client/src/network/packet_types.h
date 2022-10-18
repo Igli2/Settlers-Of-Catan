@@ -6,6 +6,7 @@ namespace network {
         REGISTER_PLAYER,
         GET_TILEMAP,
         TILE_DATA,
-        PLACE_BUILDING
+        PLACE_BUILDING,
+        CONNECT_REQUEST
     };
 }

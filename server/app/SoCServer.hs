@@ -8,16 +8,22 @@ import System.IO (IOMode(ReadWriteMode), hSetBuffering, BufferMode (NoBuffering)
 import Data.Binary.Put (runPut)
 
 import ConfigLoader
-import PacketHandler (Packet(packetType), parsePacket, sendPacket, IPAddress (IPAddress, BroadcastIP), InPacketChan, OutPacketChan, PacketChan)
-import SOCMap (createMapFromConfig, SOCMap)
-import PacketResponses (sendTileMapPackets, sendErrorPacket)
+import PacketTransfer (Packet(packetType), parsePacket, sendPacket, IPAddress (IPAddress, BroadcastIP), InPacketChan, OutPacketChan, PacketChan)
+import GameData(TileMap, createCornerMap, Player (Player))
+import PacketResponses (sendErrorPacket, sendPacketResponse)
 import GHC.Base (IO(IO), when)
+import GameState (GameState (tileMap, GameState), applyModifier, placeSettlement)
+import qualified Data.Map as Map
+import Data.Either (fromLeft, isLeft)
 
 main :: IO ()
 main = do
     socCfg <- parseConfig "config.yml" :: IO GameConfig
     mapCfg <- parseConfig (mapFile  socCfg) :: IO MapConfig
+
     let socM = createMapFromConfig mapCfg
+    let corM = createCornerMap socM
+    let gs = GameState (Map.singleton "Test" (Player Map.empty Map.empty 0 (10, 10, 10))) socM corM
 
     sock <- socket AF_INET Stream 0
     broadcastChan <- newChan :: IO PacketChan
@@ -27,15 +33,7 @@ main = do
     bind sock (SockAddrInet (fromInteger . serverPort  $ socCfg) 0)
     listen sock 4
 
-    packetSender <- forkIO . fix $  \loop -> do
-        toProcess <- readChan incomingChan
-        putStrLn $ "Received packet: " ++ show toProcess
-
-        case packetType . fst $ toProcess of
-            2 -> sendTileMapPackets socM broadcastChan (snd toProcess)
-            _ -> sendErrorPacket broadcastChan (snd toProcess) "Unknown packet type!"
-
-        loop
+    packetHandler <- forkIO $ packetHandlerLoop gs incomingChan broadcastChan
 
     broadcastClearer <- forkIO . fix $ \loop -> do
         _ <- readChan  broadcastChan
@@ -43,8 +41,28 @@ main = do
 
     serverLoop (playerCount socCfg) sock broadcastChan incomingChan
 
-    killThread packetSender
+    killThread packetHandler
     killThread broadcastClearer
+
+packetHandlerLoop :: GameState -> InPacketChan -> OutPacketChan -> IO ()
+packetHandlerLoop gs recvChan broadcastChan = do 
+    toProcess <- readChan recvChan
+    putStrLn $ "Received packet: " ++ show toProcess
+
+    gs' <- handlePacket gs toProcess broadcastChan
+
+    packetHandlerLoop gs' recvChan broadcastChan
+
+handlePacket :: GameState -> (Packet, IPAddress) -> OutPacketChan -> IO GameState
+handlePacket gs (p, ipAddr) broadcastChan = do
+    unwrapModifiedGameState $ case packetType p of
+        2 -> Right gs
+        4 -> applyModifier (placeSettlement "Test" (0, 0)) gs
+        _ -> Left "Unknown packet type!"
+
+    where unwrapModifiedGameState = either onError onSuccess
+          onSuccess gs' = sendPacketResponse p ipAddr gs' broadcastChan >> return gs'
+          onError err = sendErrorPacket broadcastChan ipAddr err >> return gs
 
 serverLoop :: Int -> Socket -> OutPacketChan -> InPacketChan -> IO ()
 serverLoop sockCount sock recvChan sendChan = do

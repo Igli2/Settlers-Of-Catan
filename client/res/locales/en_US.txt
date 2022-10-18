@@ -16,3 +16,5 @@ cant_connect: Can't Connect
 play: Start Game
 credits: Credits
 back: Back
+ip_port: IP:PORT
+your_name: YOUR NAME

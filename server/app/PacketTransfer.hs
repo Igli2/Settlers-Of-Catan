@@ -1,4 +1,4 @@
-module PacketHandler (
+module PacketTransfer (
     Packet(..),
     IPAddress(..),
     PacketChan,
@@ -18,6 +18,7 @@ import System.IO (Handle, hPutStr)
 import Data.Binary.Put (runPut, putInt8, putInt64be, putByteString, Put)
 import Network.Socket (SockAddr)
 import Control.Concurrent (Chan)
+import GameData (Position)
 
 data Packet = Packet {
     packetType :: Int8,
@@ -29,7 +30,6 @@ data IPAddress = BroadcastIP | IPAddress SockAddr deriving (Show)
 type PacketChan = Chan (Packet, IPAddress)
 type OutPacketChan = PacketChan
 type InPacketChan = PacketChan
-
 
 parsePacket :: Handle -> IO Packet
 parsePacket hdl = do

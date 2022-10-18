@@ -28,7 +28,7 @@ namespace launcher {
             sf::Texture bg_texture;
             sf::Texture bg_texture_credits;
             sf::Sprite bg_sprite;
-            // ip input border + text
+            // ip input
             sf::Text input_text;
             sf::Font font;
             std::string input_str;
@@ -38,7 +38,7 @@ namespace launcher {
             client::ClickableText back;
             sf::Vector2i last_mouse_click;
             LauncherView view;
-            // settings
+            // TODO: settings
             
             void on_key_press(sf::Event::KeyEvent event);
             void create_text(client::ClickableText& text, std::string text_localization, float x, float y);

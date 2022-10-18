@@ -38,6 +38,7 @@ void client::HexMap::render(GameWindow& game_window, GameState& game_state) {
     }
     for (const BuildingData& bd : this->buildings) {
         this->building.setTexture(game_state.get_texture_manager().get_texture(building_texture_names[bd.type]));
+        this->building.setColor(bd.color);
         this->building.setPosition(this->corner_to_pixel(bd) - sf::Vector2f{25.0f, 25.0f});
         game_window.draw(this->building);
     }
@@ -90,7 +91,7 @@ bool client::HexMap::on_click(sf::Mouse::Button button) {
                 network::PacketType::PLACE_BUILDING,
                 "SETTLEMENT " + std::to_string(corner.x) + " " + std::to_string(corner.y)
             });
-            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::SETTLEMENT});
+            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::SETTLEMENT, sf::Color::Red});
             this->currently_building = BuildingType::BUILDING_NONE;
             break;
         case BuildingType::CITY:
@@ -104,7 +105,8 @@ bool client::HexMap::on_click(sf::Mouse::Button button) {
                 network::PacketType::PLACE_BUILDING,
                 "CITY " + std::to_string(corner.x) + " " + std::to_string(corner.y)
             });
-            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::CITY});
+            this->buildings.push_back(BuildingData{corner.x, corner.y, BuildingType::CITY, sf::Color::Red});
+            this->remove_settlement(corner);
             this->currently_building = BuildingType::BUILDING_NONE;
             break;
     }
@@ -281,6 +283,7 @@ bool client::HexMap::can_place_settlement(sf::Vector2i corner) {
             }
         }
     }
+    // TODO: send validate packet
 
     return true;
 }
@@ -293,4 +296,13 @@ bool client::HexMap::can_place_city(sf::Vector2i corner) {
     }
 
     return false;
+}
+
+void client::HexMap::remove_settlement(const sf::Vector2i& corner) {
+    for (auto iter = this->buildings.begin(); iter != this->buildings.end(); iter++) {
+        if (iter->type == BuildingType::SETTLEMENT && corner.x == iter->x && corner.y == iter->y) {
+            this->buildings.erase(iter);
+            return;
+        }
+    }
 }

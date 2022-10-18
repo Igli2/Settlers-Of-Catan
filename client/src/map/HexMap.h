@@ -24,6 +24,7 @@ namespace client {
         int x;
         int y;
         BuildingType type;
+        sf::Color color;
     };
 
     class HexMap : public Clickable, public Resizable {
@@ -49,6 +50,7 @@ namespace client {
             sf::Vector2f corner_to_pixel(BuildingData building);
             bool can_place_settlement(sf::Vector2i corner);
             bool can_place_city(sf::Vector2i corner);
+            void remove_settlement(const sf::Vector2i& corner);
         public:
             sf::Vector2f pos;
             float zoom;

@@ -42,6 +42,13 @@ modifyPlayer pName pMod = M (\g ->
             Just p -> applyModifier pMod p >>= (\p' -> Right g {players = Map.insert pName p' (players g)})
     )
 
+addPlayer :: PlayerName -> Player -> Modifier GameState
+addPlayer pName player = M (\g ->
+        case Map.lookup pName (players g) of
+            Nothing -> Right g {players = Map.insert pName player (players g)}
+            Just _ -> Left $ "Tried to add player '" ++ pName ++ "', but it already exists!"
+    )
+
 modifyTiles :: Modifier TileMap -> Modifier GameState
 modifyTiles mMod = M (\g -> applyModifier mMod (tileMap g) >>= (\m' -> Right g {tileMap = m'}))
 
@@ -64,6 +71,8 @@ changeVictoryPoints delta = M (\p -> let v' = victoryPoints p + delta in
 
 cardAmount :: CardType -> Player -> Integer
 cardAmount cT = fromMaybe 0 . Map.lookup cT . playerCards
+
+-- TODO move these modifiers in extra file
 
 placeSettlement :: PlayerName -> Position -> Modifier GameState
 placeSettlement pName pos = mconcat [modifyPlayer pName settlementCosts, placeCornerPlaceable (CornerPlaceable "settlement") pName pos]
